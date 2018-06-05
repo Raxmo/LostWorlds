@@ -1,0 +1,177 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Drawing;
+using System.Dynamic;
+
+namespace LostWorlds
+{
+	/// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+	/// 
+
+	public static class Time
+	{
+		public static uint t = 0;
+		public static uint day = 86400;
+		public static uint hour = 3600;
+		public static uint minute = 60;
+		public static uint delta = 0;
+	}
+
+	public static class Sun
+	{
+		public static Utils.quat rpos = new Utils.quat(0, 0, 0, 1);
+		public static double hpd = 24;
+		public static double dpy = 364;
+		public static double tilt = Math.PI * 20 / 180;
+		public static double tiltFase = 0;
+		public static double latitude = Math.PI * 45 / 180;
+		public static double eccentricity = 0.5;
+
+
+		public static Utils.vec origin = new Utils.vec(100, 100);
+		public static Utils.vec pos = new Utils.vec(0,0);
+		public static double radius = 10;
+		public static Ellipse circle = new Ellipse();
+		public static Ellipse horizon = new Ellipse()
+		{
+			Width = 200,
+			Height = 200,
+			Stroke = Brushes.White,
+			StrokeThickness = 3
+		};
+
+		public static void draw()
+		{
+			double dvel = Math.PI * 2 / (hpd * Time.hour);
+			double yvel = Math.PI * 2 / (dpy * hpd * Time.hour);
+
+			double insvel = yvel / (1 - eccentricity * Math.Cos(yvel * Time.t));
+
+			double dpos = dvel * Time.t;
+			double ypos = yvel * Time.t;
+
+			Utils.quat ntilt = Utils.quat.Rot(tilt, new Utils.vec3(1, 0, 0));
+			ntilt = ntilt ^ Utils.quat.Rot(ypos, new Utils.vec3(0, 1, 0));
+
+			Utils.quat nrpos = rpos ^ ntilt;
+
+			Utils.quat npos = nrpos ^ Utils.quat.Rot(dpos, new Utils.vec3(0, -1, 0)) ^ Utils.quat.Rot(latitude, (Utils.vec3)(rpos) * new Utils.vec3(0, 1, 0)); //Rotates the sun around proper axis throught the day
+
+			Utils.vec3 v3 = (Utils.vec3)npos; //casting the quaterneon to a vector
+			Utils.pol3 p3 = (Utils.pol3)v3;//casting the vector to a polar 3
+			Utils.pol p = (Utils.pol)p3; //this colapses the polar3 down to a polar2 to display current heading and altitude
+
+			pos = !p * (200 / Math.PI); //make the sun draw at the correct place on the canvas
+
+			circle.Width = radius * 2;
+			circle.Height = radius * 2;
+
+			if ((pos | pos) > Math.Pow(100 + radius, 2)) //only display the sun if it is actually above the horizon
+			{
+				circle.Stroke = Brushes.Transparent;
+			}
+			else
+			{
+				circle.Stroke = Brushes.White;
+			}
+			circle.StrokeThickness = 3;
+			circle.SetValue(Canvas.LeftProperty, (pos + origin).x - radius);
+			circle.SetValue(Canvas.TopProperty, (pos + origin).y - radius);
+		}
+
+		
+	}
+
+	public static class Larder
+	{
+		public static uint volume = 0;
+		public static uint density = 0;
+		public static uint water = 0;
+
+		public static void add(Food item, uint volume)
+		{
+			double energy = density * Larder.volume;
+			double wat = water * Larder.volume;
+			Larder.volume += volume;
+			energy += item.energy * volume;
+			wat += item.water * volume;
+			density =(uint)(energy / Larder.volume);
+			water = (uint)(wat / Larder.volume);
+		}
+	}
+
+	public static class Home
+	{
+
+	}
+
+	public partial class MainWindow : Window
+	{
+		public MainWindow()
+		{
+			InitializeComponent();
+			app = this;
+			Areas.start.load();
+			update();
+		}
+
+		public static MainWindow app;
+
+		public void update()
+		{
+			uint numDays = (Time.t / Time.day) % 364;
+			uint numYears = (Time.t / Time.day) / 364;
+
+			days.Content = "Days: " + numDays;
+			years.Content = "Years: " + numYears;
+
+			Characters.uptdate();
+
+			playerHunger.Foreground = Characters.player.hungerColor();
+			playerThurst.Foreground = Characters.player.thirstColor();
+			partnerHunger.Foreground = Characters.partner.hungerColor();
+			partnerThurst.Foreground = Characters.partner.thirstColor();
+			tracker.Children.Clear();
+			tracker.Children.Add(Sun.horizon);
+			Sun.draw();
+			tracker.Children.Add(Sun.circle);
+		}
+
+		private void button_Click(object sender, RoutedEventArgs e)
+		{
+			if (Areas.back.Count() > 0)
+			{
+				Time.t += Areas.curr.travelTime;
+				Characters.player.hunger -= (int)((7500 * Areas.curr.travelTime) / Time.day);
+				Characters.player.thirst -= (int)((7500 * Areas.curr.travelTime) / Time.day);
+				Areas.back[Areas.back.Count() - 1].load();
+				Areas.back.RemoveAt(Areas.back.Count() - 1);
+			}
+			update();
+		}
+
+		private void home_Click(object sender, RoutedEventArgs e)
+		{
+			Time.t += Areas.curr.returnTime;
+			Characters.player.hunger -= (int)((7500 * Areas.curr.returnTime) / Time.day);
+			Characters.player.thirst -= (int)((7500 * Areas.curr.returnTime) / Time.day);
+			Areas.back.Clear();
+			Areas.home.load();
+			update();
+		}
+	}
+}
