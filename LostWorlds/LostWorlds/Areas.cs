@@ -53,7 +53,7 @@ namespace LostWorlds
 			Button clicked = (Button)sender;
 			int index = Int32.Parse(clicked.Name.Split('b')[1]);
 			Areas.back.Add(this);
-			Time.t += options[index].travelTime;
+			Time.delta = options[index].travelTime;
 			options[index].load();
 		}
 
@@ -63,13 +63,13 @@ namespace LostWorlds
 			act?.Invoke();
 			loadOptions();
 
-			Time.t += actionTime;
-			Characters.player.hunger -= (int)((hrate * actionTime) / Time.day);
-			Characters.player.thirst -= (int)((trate * actionTime) / Time.day);
+			Time.delta += actionTime;
+			Characters.hrate = hrate / Time.day;
+			Characters.trate = trate / Time.day;
 
 			if (isFirstVisit)
 			{
-				Time.t += firstVisitTime;
+				Time.delta += firstVisitTime;
 				MainWindow.app.mainText.SelectAll();
 				MainWindow.app.mainText.Selection.Text = firstVisitText;
 				isFirstVisit = false;
@@ -92,19 +92,8 @@ namespace LostWorlds
 		/*
 		 * Each area is stored here there is a particular way to set them up however
 		 * 
-		 * [name] is the name that is displayed on the buttons that go to the area
-		 * [time] is the time it takes to get there in seconds
-		 * [returnTime] is the time it takes to get back home in seconds
-		 * [backTime] is the time it takes to return to the previouse page/area/place
-		 * [hrate] is the kJ/hour you burn getting there
-		 * [trate] is the thirst/hour that you use getting there (currently it's based off of hunger
-		 * [text] is the text that is displayed 
-		 * [options] MUST = new List<Area>() and be populated with the areas that you can go to from that location
-		 * [act] = (() => 
-		 * {
+		 * name = the name that is displayed on the button to go to this particular area/menue
 		 * 
-		 * }
-		 *                act is where you put in any special logic that must be ran on area load, so special things can happen
 		 */
 
 		public static Area harvest = new Area()
@@ -141,7 +130,7 @@ namespace LostWorlds
 			returnTime = 15 * Time.minute,
 			travelTime = 15 * Time.minute,
 			hrate = 15000,
-			trate = 15000,
+			trate = 7000,
 			text = "You look up at the cliff, noticing quite a good number of hand-holds. You become confident that you can climb the whole thing in one go, so you start to climb up the side of the cliff. You take a good while to reach the top, carefully climbing as you go, given you have no safty net of any kind to keep you from falling off, but you do end up reaching the top to see a beautifull flowery meddow before you. you do notice a relatively fast and safe way back down the cliff side to your little camp below.",
 			firstVisitText = "You look up at the cliff, noticing quite a good number of hand-holds. You become confident that you can climb the whole thing in one go, so you start to climb up the side of the cliff. You take a good while to reach the top, carefully climbing as you go, given you have no safty net of any kind to keep you from falling off, but you do end up reaching the top to see a beautifull flowery meddow before you. you do notice a relatively fast and safe way back down the cliff side to your little camp below.",
 			act = (() =>
@@ -186,12 +175,12 @@ namespace LostWorlds
 			actionTime = 5 * Time.minute,
 			returnTime = 0,
 			isFirstVisit = false,
+			text = "You move over to the fresh spring and take a drink of fresh water. the cool water tastes rather lovely, and clean. The water is likely the best quality that you could manage in this area",
 			act = (() =>
 			{
-				if (Characters.player.stomach < 1000)
+				foreach(Character c in Characters.active)
 				{
-					drink.text = "You decide to have a little water to drink, given that you are a little thirsty.";
-					Characters.player.thirst += (int)(1000 - Characters.player.stomach);
+					c.drink(1000);
 				}
 			})
 		};
@@ -210,22 +199,42 @@ namespace LostWorlds
 					{
 						eatDrink.text = "You decide to sit down and have a little something to eat and drink. You walk over to the pile of food you have set up and gather a little bit of it to sit down and eat. While eating you listen to the trees swaying in the gentle breeze, and you move over to the spring in the side of the cliff to have a little water for yourself.";
 						Larder.volume -= 750;
-						Characters.player.hunger += (int)(Larder.density * 750);
-						Characters.player.thirst += (int)(Larder.water * 750 + 250);
+						foreach(Character c in Characters.active)
+						{
+							uint room = c.capacity - c.stomach;
+							c.eatDrink(Larder.density * (room * 75) / 100, Larder.water * (room * 75) / 100 + (room * 250) / 1000, 1000);
+						}
 					}
 					else
 					{
 						eatDrink.text = "You decide to have something to eat, but you come to the conclusion that there isn't really enough for a full meal, but you decide to eat the rest of it anyway and perhaps go to gather up some more food at a later time.";
-						Characters.player.hunger += (int)(Larder.density * Larder.volume);
-						Characters.player.thirst += (int)(Larder.water * Larder.volume + 250);
-						Larder.volume = 0;
-						Larder.density = 0;
+						uint eaten = 0;
+
+						foreach(Character c in Characters.active)
+						{
+							uint room = c.capacity - c.stomach;
+							if(room > Larder.volume)
+							{
+								eaten = Larder.volume;
+								Larder.density = 0;
+							}
+							else
+							{
+								eaten = Larder.volume - c.stomach;
+							}
+							c.eatDrink(Larder.density * (eaten * 75) / 100, Larder.water * (eaten * 75) / 100 + (room * 250) / 1000, 1000);
+						}
+						
+						Larder.volume -= eaten;
 					}
 				}
 				else
 				{
 					eatDrink.text = "You are saddened by the fact that you have no food at the moment, but you can still get some water to drink from the stream. it won't stop you from being hungry, but at least you won't be dehidrated";
-					Characters.player.thirst += 2500;
+					foreach(Character c in Characters.active)
+					{
+						c.drink(c.capacity - c.stomach);
+					}
 				}
 			})
 		};

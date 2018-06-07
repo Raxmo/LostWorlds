@@ -7,13 +7,28 @@ using System.Windows.Media;
 
 namespace LostWorlds
 {
+	public struct Stats
+	{
+		public double damage;
+		public double dodge;
+		public double endurance;
+		public double attack;
+	}
+
 	public class Character
 	{
 		public int hunger = 7500;
 		public int energy = 7500;
 		public int thirst = 3500;
 		public uint stomach = 500;
-		private uint capacity = 1000;
+		public uint capacity = 1000;
+
+		public Stats stats = new Stats()
+		{
+			damage = 0,
+			attack = 100,
+			endurance = 100
+		};
 
 		public void update()
 		{
@@ -21,6 +36,19 @@ namespace LostWorlds
 			thirst -= (int)(Characters.trate * Time.delta);
 			stomach -= (uint)(Characters.srate * Time.delta);
 
+		}
+
+		public void eatDrink(uint food, uint water, uint volume)
+		{
+			hunger += (int)food;
+			thirst += (int)water;
+			stomach += volume;
+		}
+
+		public void drink(uint water)
+		{
+			thirst += (int)water;
+			capacity += water;
 		}
 
 		public SolidColorBrush hungerColor()
@@ -60,7 +88,7 @@ namespace LostWorlds
 		public static Character player = new Character();
 		public static Character partner = new Character();
 
-		private static List<Character> active = new List<Character>()
+		public static List<Character> active = new List<Character>()
 		{
 			player
 		};

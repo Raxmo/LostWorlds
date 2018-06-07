@@ -34,12 +34,12 @@ namespace LostWorlds
 	public static class Sun
 	{
 		public static Utils.quat rpos = new Utils.quat(0, 0, 0, 1);
-		public static double hpd = 24;
-		public static double dpy = 364;
-		public static double tilt = Math.PI * 20 / 180;
-		public static double tiltFase = 0;
-		public static double latitude = Math.PI * 45 / 180;
-		public static double eccentricity = 0.5;
+		public static double hpd = 24; //hours per day
+		public static double dpy = 364; //days per year
+		public static double tilt = Math.PI * 20 / 180; //axial tilt of the planet
+		public static double tiltFase = 0; //this is the offset of the tilt relative to the orbital position
+		public static double latitude = Math.PI * 45 / 180; //the current latitude of the viewer
+		public static double eccentricity = 0.5; //TODO: actually impliment this. No idea quite how to impliment the varying day-length imposed by eccentricity of the orbit.
 
 
 		public static Utils.vec origin = new Utils.vec(100, 100);
@@ -59,15 +59,15 @@ namespace LostWorlds
 			double dvel = Math.PI * 2 / (hpd * Time.hour);
 			double yvel = Math.PI * 2 / (dpy * hpd * Time.hour);
 
-			double insvel = yvel / (1 - eccentricity * Math.Cos(yvel * Time.t));
+			double insvel = yvel / (1 - eccentricity * Math.Cos(yvel * Time.t)); //Deppricated code, this doesn't work the way I need it to. Eccentricity will likely need to be passed through an integral in order to get the propper function to shift the sun's position correctly due to eccentricity
 
 			double dpos = dvel * Time.t;
 			double ypos = yvel * Time.t;
 
-			Utils.quat ntilt = Utils.quat.Rot(tilt, new Utils.vec3(1, 0, 0));
-			ntilt = ntilt ^ Utils.quat.Rot(ypos, new Utils.vec3(0, 1, 0));
+			Utils.quat ntilt = Utils.quat.Rot(tilt, new Utils.vec3(1, 0, 0)); //stores a rotation bassed off of the axial tilt
+			ntilt = ntilt ^ Utils.quat.Rot(ypos, new Utils.vec3(0, 1, 0)); //rotates the rotation bassed off of the orbital position
 
-			Utils.quat nrpos = rpos ^ ntilt;
+			Utils.quat nrpos = rpos ^ ntilt; //offsets the position given the current latitude
 
 			Utils.quat npos = nrpos ^ Utils.quat.Rot(dpos, new Utils.vec3(0, -1, 0)) ^ Utils.quat.Rot(latitude, (Utils.vec3)(rpos) * new Utils.vec3(0, 1, 0)); //Rotates the sun around proper axis throught the day
 
@@ -106,9 +106,11 @@ namespace LostWorlds
 		{
 			double energy = density * Larder.volume;
 			double wat = water * Larder.volume;
+
 			Larder.volume += volume;
 			energy += item.energy * volume;
 			wat += item.water * volume;
+
 			density =(uint)(energy / Larder.volume);
 			water = (uint)(wat / Larder.volume);
 		}
@@ -133,13 +135,15 @@ namespace LostWorlds
 
 		public void update()
 		{
+			Time.t += Time.delta;
+
 			uint numDays = (Time.t / Time.day) % 364;
 			uint numYears = (Time.t / Time.day) / 364;
 
 			days.Content = "Days: " + numDays;
 			years.Content = "Years: " + numYears;
 
-			Characters.uptdate();
+			Characters.update();
 
 			playerHunger.Foreground = Characters.player.hungerColor();
 			playerThurst.Foreground = Characters.player.thirstColor();
@@ -149,15 +153,15 @@ namespace LostWorlds
 			tracker.Children.Add(Sun.horizon);
 			Sun.draw();
 			tracker.Children.Add(Sun.circle);
+
+			Time.delta = 0;
 		}
 
 		private void button_Click(object sender, RoutedEventArgs e)
 		{
 			if (Areas.back.Count() > 0)
 			{
-				Time.t += Areas.curr.travelTime;
-				Characters.player.hunger -= (int)((7500 * Areas.curr.travelTime) / Time.day);
-				Characters.player.thirst -= (int)((7500 * Areas.curr.travelTime) / Time.day);
+				Time.delta = Areas.curr.travelTime;
 				Areas.back[Areas.back.Count() - 1].load();
 				Areas.back.RemoveAt(Areas.back.Count() - 1);
 			}
@@ -166,9 +170,7 @@ namespace LostWorlds
 
 		private void home_Click(object sender, RoutedEventArgs e)
 		{
-			Time.t += Areas.curr.returnTime;
-			Characters.player.hunger -= (int)((7500 * Areas.curr.returnTime) / Time.day);
-			Characters.player.thirst -= (int)((7500 * Areas.curr.returnTime) / Time.day);
+			Time.delta = Areas.curr.returnTime;
 			Areas.back.Clear();
 			Areas.home.load();
 			update();
