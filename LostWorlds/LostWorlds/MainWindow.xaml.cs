@@ -137,7 +137,7 @@ namespace LostWorlds
 		{
 			Time.t += Time.delta;
 
-			uint numDays = (Time.t / Time.day) % 364;
+			uint numDays = ((Time.t + Time.hour * 12) / Time.day) % 364;
 			uint numYears = (Time.t / Time.day) / 364;
 
 			days.Content = "Days: " + numDays;

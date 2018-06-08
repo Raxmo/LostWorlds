@@ -27,6 +27,7 @@ namespace LostWorlds
 		{
 			damage = 0,
 			attack = 100,
+			dodge = 100,
 			endurance = 100
 		};
 
@@ -35,6 +36,7 @@ namespace LostWorlds
 			hunger -= (int)(Characters.hrate * Time.delta);
 			thirst -= (int)(Characters.trate * Time.delta);
 			stomach -= (uint)(Characters.srate * Time.delta);
+			stats.damage = Math.Max(0, stats.damage - Characters.drate * Time.delta);
 
 		}
 
@@ -84,6 +86,7 @@ namespace LostWorlds
 		public static double hrate = 7500 / Time.day;
 		public static double trate = 3500 / Time.day;
 		public static double srate = 1 / (4 * Time.hour);
+		public static double drate = 100 / Time.day;
 
 		public static Character player = new Character();
 		public static Character partner = new Character();

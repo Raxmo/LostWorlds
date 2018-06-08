@@ -13,6 +13,7 @@ namespace LostWorlds
 	public class Area
 	{
 		public List<Area> options = new List<Area>();
+		public Encounter encounter = null;
 		public string name;
 		public string text;
 		public uint travelTime;
@@ -78,6 +79,10 @@ namespace LostWorlds
 			{
 				MainWindow.app.mainText.SelectAll();
 				MainWindow.app.mainText.Selection.Text = text;
+			}
+			if(encounter != null)
+			{
+				encounter.load();
 			}
 			MainWindow.app.update();
 		}
@@ -166,7 +171,16 @@ namespace LostWorlds
 			options = new List<Area>()
 			{
 				fish
-			}
+			},
+			act = (() =>
+			{
+				Random rand = new Random();
+				double tart = rand.NextDouble();
+				if (tart < 0.25)
+				{
+					stream.encounter = Encounters.test;
+				}
+			})
 		};
 
 		public static Area drink = new Area()
