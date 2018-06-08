@@ -57,7 +57,7 @@ namespace LostWorlds
 		{
 			var col = (byte)(255 * Math.Pow(Math.E, -Math.Pow(Hunger, 2) / Math.Pow(7500 / 3, 2))); //this logic plots hunger on a more accurate scale, that is asymtotic, so the entire number line maps to between 0, and 255. 7500 is the daily requirement in kJ for energy
 
-            //ternart would be much nicer here, but some people don't like it, it would be return Hunger >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
+            //ternary would be much nicer here, but some people don't like it, it would be return Hunger >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
             if (Hunger >= 0)
 			{
 				return new SolidColorBrush(Color.FromRgb(col, col, col));

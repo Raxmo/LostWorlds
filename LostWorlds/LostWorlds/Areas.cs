@@ -28,7 +28,7 @@ namespace LostWorlds
 
 		private void LoadOptions()
 		{
-			MainWindow.App.options.Children.Clear();
+			MainWindow.App.Options.Children.Clear();
 			if (Options.Count > 0 && Options != null)
 			{
 				for (var i = 0; i < Options.Count(); i++)
@@ -42,7 +42,7 @@ namespace LostWorlds
 					b.BorderBrush = Brushes.White;
 					b.Click += new RoutedEventHandler(OptionClick);
 
-					MainWindow.App.options.Children.Add(b);
+					MainWindow.App.Options.Children.Add(b);
 					Grid.SetColumn(b, (i % 2));
 					Grid.SetRow(b, i / 2);
 				}
@@ -71,14 +71,14 @@ namespace LostWorlds
 			if (IsFirstVisit)
 			{
 				Time.Delta += FirstVisitTime;
-				MainWindow.App.mainText.SelectAll();
-				MainWindow.App.mainText.Selection.Text = FirstVisitText;
+				MainWindow.App.MainText.SelectAll();
+				MainWindow.App.MainText.Selection.Text = FirstVisitText;
 				IsFirstVisit = false;
 			}
 			else
 			{
-				MainWindow.App.mainText.SelectAll();
-				MainWindow.App.mainText.Selection.Text = Text;
+				MainWindow.App.MainText.SelectAll();
+				MainWindow.App.MainText.Selection.Text = Text;
 			}
             //this could be elegantly solved by null propagation using the null conditional ? would simply look like Encounter?.Load();
             if (Encounter != null)

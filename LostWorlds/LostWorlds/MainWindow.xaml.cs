@@ -59,7 +59,7 @@ namespace LostWorlds
 			var dvel = Math.PI * 2 / (Hpd * Time.Hour);
 			var yvel = Math.PI * 2 / (Dpy * Hpd * Time.Hour);
 
-			var insvel = yvel / (1 - Eccentricity * Math.Cos(yvel * Time.T)); //Deppricated code, this doesn't work the way I need it to. Eccentricity will likely need to be passed through an integral in order to get the propper function to shift the sun's position correctly due to eccentricity
+			var insvel = yvel / (1 - Eccentricity * Math.Cos(yvel * Time.T)); //Deppricated code, this doesn't work the way I need it to. Eccentricity will likely need to be passed through an integral in order to get the proper function to shift the sun's position correctly due to eccentricity
 
 			var dpos = dvel * Time.T;
 			var ypos = yvel * Time.T;
@@ -141,19 +141,19 @@ namespace LostWorlds
 			var numDays = ((Time.T + Time.Hour * 12) / Time.Day) % 364;
 			var numYears = (Time.T / Time.Day) / 364;
 
-			days.Content = "Days: " + numDays;
-			years.Content = "Years: " + numYears;
+			Days.Content = "Days: " + numDays;
+			Years.Content = "Years: " + numYears;
 
 			Characters.Update();
 
-			playerHunger.Foreground = Characters.Player.HungerColor();
-			playerThurst.Foreground = Characters.Player.ThirstColor();
-			partnerHunger.Foreground = Characters.Partner.HungerColor();
-			partnerThurst.Foreground = Characters.Partner.ThirstColor();
-			tracker.Children.Clear();
-			tracker.Children.Add(Sun.Horizon);
+			PlayerHunger.Foreground = Characters.Player.HungerColor();
+			PlayerThurst.Foreground = Characters.Player.ThirstColor();
+			PartnerHunger.Foreground = Characters.Partner.HungerColor();
+			PartnerThurst.Foreground = Characters.Partner.ThirstColor();
+			Tracker.Children.Clear();
+			Tracker.Children.Add(Sun.Horizon);
 			Sun.Draw();
-			tracker.Children.Add(Sun.Circle);
+			Tracker.Children.Add(Sun.Circle);
 
 			Time.Delta = 0;
 		}

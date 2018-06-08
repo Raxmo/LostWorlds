@@ -37,11 +37,11 @@ namespace LostWorlds
 			run.BorderBrush = Brushes.White;
 			run.Click += new RoutedEventHandler(RunClicked);
 
-			MainWindow.App.options.Children.Add(attack);
+			MainWindow.App.Options.Children.Add(attack);
 			Grid.SetColumn(attack, 0);
 			Grid.SetRow(attack, 0);
 
-			MainWindow.App.options.Children.Add(run);
+			MainWindow.App.Options.Children.Add(run);
 			Grid.SetColumn(run, 1);
 			Grid.SetRow(run, 0);
 		}
@@ -69,7 +69,7 @@ namespace LostWorlds
 					temptext += "you recoil from the hit but are still able to fight. ";
 				}
 			}
-			else if (Math.Abs(edamage) < double.Epsilon) //propper way of comparing because of possible imprecision inherent to floating point numbers
+			else if (Math.Abs(edamage) < double.Epsilon) //proper way of comparing because of possible imprecision inherent to floating point numbers
             {
 				temptext += "the enemy mearly grazes you. ";
 			}
@@ -101,7 +101,7 @@ namespace LostWorlds
 					temptext += EnemyAttack();	
 				}
 			}
-			else if(Math.Abs(damage) < double.Epsilon)  //propper way of comparing because of possible imprecision inherent to floating point numbers
+			else if(Math.Abs(damage) < double.Epsilon)  //proper way of comparing because of possible imprecision inherent to floating point numbers
             {
 				temptext += "You mearly graze the opponent, and they lash back at you!";
 				temptext += EnemyAttack();
@@ -111,8 +111,8 @@ namespace LostWorlds
 				temptext += "You completely miss the opponent, and they use this opportunity to counter with an attack of their own!";
 				temptext += EnemyAttack();
 			}
-			MainWindow.App.mainText.SelectAll();
-			MainWindow.App.mainText.Selection.Text = temptext;
+			MainWindow.App.MainText.SelectAll();
+			MainWindow.App.MainText.Selection.Text = temptext;
 			Time.Delta = 6;
 			MainWindow.App.Update();
 		}
@@ -126,7 +126,7 @@ namespace LostWorlds
 
 		private void Finish(bool survived)
 		{
-			MainWindow.App.options.Children.Clear();
+			MainWindow.App.Options.Children.Clear();
             //initialisers are cleaner
 		    var finished = new Button
 		    {
@@ -144,7 +144,7 @@ namespace LostWorlds
 			{
 				finished.Click += new RoutedEventHandler(DiedClicked);
 			}
-			MainWindow.App.options.Children.Add(finished);
+			MainWindow.App.Options.Children.Add(finished);
 			Grid.SetColumn(finished, 0);
 			Grid.SetRow(finished, 0);
 			Grid.SetColumnSpan(finished, 2);
@@ -166,11 +166,11 @@ namespace LostWorlds
 
 		public void Load()
 		{
-			MainWindow.App.options.Children.Clear();
+			MainWindow.App.Options.Children.Clear();
 			LoadActions();
 			Location = Areas.Curr;
-			MainWindow.App.mainText.SelectAll();
-			MainWindow.App.mainText.Selection.Text = Text;
+			MainWindow.App.MainText.SelectAll();
+			MainWindow.App.MainText.Selection.Text = Text;
 		}
 	}
 
