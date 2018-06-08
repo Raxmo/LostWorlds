@@ -8,240 +8,240 @@ namespace LostWorlds
 {
 	public static class Utils
 	{
-		public static double gaussian(double m, double d) //random numbers within normal distribution, don't ask how it works, don't care, it just does. it's probably something allong the lines of the derivative of cosine at 0 is similar to the derivative of the normal distribution and the edge casses look like negetive log function or something? not sure and again, don't really care.
+		public static double Gaussian(double m, double d) //random numbers within normal distribution, don't ask how it works, don't care, it just does. it's probably something allong the lines of the derivative of cosine at 0 is similar to the derivative of the normal distribution and the edge casses look like negetive log function or something? not sure and again, don't really care.
 		{
-			Random rand = new Random();
-			double u1 = 1.0 - rand.NextDouble();
-			double u2 = 1.0 - rand.NextDouble();
+			var rand = new Random();
+			var u1 = 1.0 - rand.NextDouble();
+			var u2 = 1.0 - rand.NextDouble();
 
-			double randNorm = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
+			var randNorm = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
 
 			return randNorm * d + m;
 		}
 
-		public struct pol //polar vector
+		public struct Pol //polar vector
 		{
-			public double a;
-			public double r;
+			public double A;
+			public double R;
 
-			public pol(double a, double r)
+			public Pol(double a, double r)
 			{
-				this.a = a;
-				this.r = r;
+				this.A = a;
+				this.R = r;
 			}
 
-			public static pol operator ~(pol a) //normalize
+			public static Pol operator ~(Pol a) //normalize
 			{
-				return new pol(a.a, 1);
+				return new Pol(a.A, 1);
 			}
 
-			public static vec operator !(pol a) //convert from polar to cartesian
+			public static Vec operator !(Pol a) //convert from polar to cartesian
 			{
-				return new vec(Math.Cos(a.a) * a.r, Math.Sin(a.a) * a.r);
+				return new Vec(Math.Cos(a.A) * a.R, Math.Sin(a.A) * a.R);
 			}
 
-			public static pol operator +(pol a, pol b) //mostly used for adding angles, but could add an angle and distance simultaniously
+			public static Pol operator +(Pol a, Pol b) //mostly used for adding angles, but could add an angle and distance simultaniously
 			{
-				return new pol(a.a + b.a, a.r + b.r);
+				return new Pol(a.A + b.A, a.R + b.R);
 			}
 
-			public static pol operator -(pol a, pol b)
+			public static Pol operator -(Pol a, Pol b)
 			{
-				return new pol(a.a - b.a, a.r - b.r);
+				return new Pol(a.A - b.A, a.R - b.R);
 			}
 
-			public static pol operator *(pol a, pol b) //polar version of complex multiplication
+			public static Pol operator *(Pol a, Pol b) //polar version of complex multiplication
 			{
-				return new pol(a.a + b.a, a.r * b.r);
+				return new Pol(a.A + b.A, a.R * b.R);
 			}
 
-			public static pol operator *(pol p, double b) //scalar multiplication
+			public static Pol operator *(Pol p, double b) //scalar multiplication
 			{
-				return new pol(p.a, p.r * b);
+				return new Pol(p.A, p.R * b);
 			}
 
-			public static pol operator /(pol a, pol b) //polar version of complex division
+			public static Pol operator /(Pol a, Pol b) //polar version of complex division
 			{
-				return new pol(a.a - b.a, a.r / b.r);
+				return new Pol(a.A - b.A, a.R / b.R);
 			}
 
-			public static double operator |(pol a, pol b) //polar version of dot product
+			public static double operator |(Pol a, Pol b) //polar version of dot product
 			{
-				return (a.r * b.r * Math.Cos(b.a - a.a));
+				return (a.R * b.R * Math.Cos(b.A - a.A));
 			}
 
-			public static explicit operator pol(pol3 p)
+			public static explicit operator Pol(Pol3 p)
 			{
-				return new pol(p.h, p.a); //casting from pol3 to pol
+				return new Pol(p.H, p.A); //casting from pol3 to pol
 			}
 		}
 
 
-		public struct vec
+		public struct Vec
 		{
-			public double x;
-			public double y;
+			public double X;
+			public double Y;
 
-			public vec(double x, double y)
+			public Vec(double x, double y)
 			{
-				this.x = x;
-				this.y = y;
+				this.X = x;
+				this.Y = y;
 			}
 
-			public static vec operator ~(vec a) //normalize
+			public static Vec operator ~(Vec a) //normalize
 			{
-				return new vec(Math.Pow(a.x, 2), Math.Pow(a.y, 2)) / (a | a);
+				return new Vec(Math.Pow(a.X, 2), Math.Pow(a.Y, 2)) / (a | a);
 			}
 
-			public static pol operator !(vec a) //convert from cartesian to polar
+			public static Pol operator !(Vec a) //convert from cartesian to polar
 			{
-				return new pol(Math.Atan2(a.y, a.x), Math.Sqrt(a.x * a.x + a.y * a.y));
+				return new Pol(Math.Atan2(a.Y, a.X), Math.Sqrt(a.X * a.X + a.Y * a.Y));
 			}
 
-			public static vec operator +(vec a, vec b)
+			public static Vec operator +(Vec a, Vec b)
 			{
-				return new vec(a.x + b.x, a.y + b.y);
+				return new Vec(a.X + b.X, a.Y + b.Y);
 			}
 
-			public static vec operator -(vec a, vec b)
+			public static Vec operator -(Vec a, Vec b)
 			{
-				return new vec(a.x - b.x, a.y - b.y);
+				return new Vec(a.X - b.X, a.Y - b.Y);
 			}
 
-			public static vec operator *(vec a, vec b) //complex multiplication
+			public static Vec operator *(Vec a, Vec b) //complex multiplication
 			{
-				return new vec(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+				return new Vec(a.X * b.X - a.Y * b.Y, a.X * b.Y + a.Y * b.X);
 			}
 
-			public static vec operator *(vec a, double b) //scalar multiplication
+			public static Vec operator *(Vec a, double b) //scalar multiplication
 			{
-				return new vec(a.x * b, a.y * b);
+				return new Vec(a.X * b, a.Y * b);
 			}
 
-			public static vec operator /(vec a, vec b) //complex division
+			public static Vec operator /(Vec a, Vec b) //complex division
 			{
-				return new vec((a.x * b.x + a.y * b.y) / (b | b), (a.y * b.x - a.x * b.y) / (b | b));
+				return new Vec((a.X * b.X + a.Y * b.Y) / (b | b), (a.Y * b.X - a.X * b.Y) / (b | b));
 			}
 
-			public static vec operator /(vec a, double b)
+			public static Vec operator /(Vec a, double b)
 			{
-				return new vec(a.x / b, a.y / b);
+				return new Vec(a.X / b, a.Y / b);
 			}
 
-			public static double operator |(vec a, vec b) //dot product
+			public static double operator |(Vec a, Vec b) //dot product
 			{
-				return (a.x * b.x + a.y * b.y);
+				return (a.X * b.X + a.Y * b.Y);
 			}
 		}
 
-		public struct pol3
+		public struct Pol3
 		{
-			public double h, a, r;
+			public double H, A, R;
 
-			public pol3(double h, double a, double r)
+			public Pol3(double h, double a, double r)
 			{
-				this.h = h;
-				this.a = a;
-				this.r = r;
+				this.H = h;
+				this.A = a;
+				this.R = r;
 			}
 
-			public static explicit operator pol3(vec3 v) //converting from cartesian to polar
+			public static explicit operator Pol3(Vec3 v) //converting from cartesian to polar
 			{
-				return new pol3(
-					Math.Atan2(v.y, v.x),
-					Math.Acos(v.z / Math.Sqrt(v | v)),
+				return new Pol3(
+					Math.Atan2(v.Y, v.X),
+					Math.Acos(v.Z / Math.Sqrt(v | v)),
 					Math.Sqrt(v | v));
 			}
 		}
 
-		public struct vec3
+		public struct Vec3
 		{
-			public double x, y, z;
+			public double X, Y, Z;
 
-			public vec3(double x, double y, double z)
+			public Vec3(double x, double y, double z)
 			{
-				this.x = x;
-				this.y = y;
-				this.z = z;
+				this.X = x;
+				this.Y = y;
+				this.Z = z;
 			}
 
-			public static vec3 operator *(vec3 a, double b) //scalar multiplication
+			public static Vec3 operator *(Vec3 a, double b) //scalar multiplication
 			{
-				return new vec3(a.x * b, a.y * b, a.z * b);
+				return new Vec3(a.X * b, a.Y * b, a.Z * b);
 			}
 
-			public static vec3 operator *(vec3 a, vec3 b)
+			public static Vec3 operator *(Vec3 a, Vec3 b)
 			{
-				return new vec3(
-					a.y * b.z - a.z * b.y,
-					a.z * b.x - a.x * b.z,
-					a.x * b.y - a.y * b.x);
+				return new Vec3(
+					a.Y * b.Z - a.Z * b.Y,
+					a.Z * b.X - a.X * b.Z,
+					a.X * b.Y - a.Y * b.X);
 			}
 
-			public static vec3 operator /(vec3 a, double b) //scalar division
+			public static Vec3 operator /(Vec3 a, double b) //scalar division
 			{
-				return new vec3(a.x / b, a.y / b, a.z / b);
+				return new Vec3(a.X / b, a.Y / b, a.Z / b);
 			}
 
-			public static vec3 operator ~(vec3 a) //normalize
+			public static Vec3 operator ~(Vec3 a) //normalize
 			{
 				return a / Math.Sqrt(a | a);
 			}
 
-			public static double operator |(vec3 a, vec3 b) //dot product
+			public static double operator |(Vec3 a, Vec3 b) //dot product
 			{
-				return (a.x * b.x + a.y * b.y + a.z * b.z);
+				return (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
 			}
 
-			public static explicit operator vec3(quat q) //grabbing the vector component of a quaterneon
+			public static explicit operator Vec3(Quat q) //grabbing the vector component of a quaterneon
 			{
-				return new vec3(q.i, q.j, q.k);
+				return new Vec3(q.I, q.J, q.K);
 			}
 		}
 
-		public struct quat
+		public struct Quat
 		{
-			public double r, i, j, k;
+			public double R, I, J, K;
 
-			public quat(double r, double i, double j, double k)
+			public Quat(double r, double i, double j, double k)
 			{
-				this.r = r;
-				this.i = i;
-				this.j = j;
-				this.k = k;
+				this.R = r;
+				this.I = i;
+				this.J = j;
+				this.K = k;
 			}
 
-			public quat(double a, vec3 v) // angle vector construction
+			public Quat(double a, Vec3 v) // angle vector construction
 			{
-				r = a;
-				i = v.x;
-				j = v.y;
-				k = v.z;
+				R = a;
+				I = v.X;
+				J = v.Y;
+				K = v.Z;
 			}
 
-			public static quat operator *(quat a, quat b) //quaterneon multiplication kinda sucks
+			public static Quat operator *(Quat a, Quat b) //quaterneon multiplication kinda sucks
 			{
-				return new quat(
-					a.r * b.r - a.i * b.i - a.j * b.j - a.k * b.k,
-					a.r * b.i + a.i * b.r + a.j * b.k - a.k * b.j,
-					a.r * b.j - a.i * b.k + a.j * b.r + a.k * b.i,
-					a.r * b.k + a.i * b.j - a.j * b.i + a.k * b.r);
+				return new Quat(
+					a.R * b.R - a.I * b.I - a.J * b.J - a.K * b.K,
+					a.R * b.I + a.I * b.R + a.J * b.K - a.K * b.J,
+					a.R * b.J - a.I * b.K + a.J * b.R + a.K * b.I,
+					a.R * b.K + a.I * b.J - a.J * b.I + a.K * b.R);
 			}
 
-			public static quat operator !(quat a) //congugation of quaterneon
+			public static Quat operator !(Quat a) //congugation of quaterneon
 			{
-				return new quat(a.r, -a.i, -a.j, -a.k);
+				return new Quat(a.R, -a.I, -a.J, -a.K);
 			}
 
-			public static quat operator ^(quat a, quat b) //rotational multiplication of two quaterneons
+			public static Quat operator ^(Quat a, Quat b) //rotational multiplication of two quaterneons
 			{
 				return b * a * (!b);
 			}
 
-			public static quat Rot(double a, vec3 v)
+			public static Quat Rot(double a, Vec3 v)
 			{
 
-				return new quat(Math.Cos(a / 2), ~v * Math.Sin(a / 2));
+				return new Quat(Math.Cos(a / 2), ~v * Math.Sin(a / 2));
 			}
 		}
 	}

@@ -8,19 +8,20 @@ namespace LostWorlds
 {
 	public class Enemy
 	{
-		public Stats stats = new Stats();
+		public Stats Stats = new Stats();
 	}
 
+    //again the internal classes may be readonly, unless you intend to mutate during game...
 	public static class Enemies
 	{
-		public static Enemy test = new Enemy()
+		public static readonly Enemy Test = new Enemy()
 		{
-			stats = new Stats()
+			Stats = new Stats()
 			{
-				damage = 0,
-				attack = 85,
-				dodge = 85,
-				endurance = 85
+				Damage = 0,
+				Attack = 85,
+				Dodge = 85,
+				Endurance = 85
 			}
 		};
 	}
