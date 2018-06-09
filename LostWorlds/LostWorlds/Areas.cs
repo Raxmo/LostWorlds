@@ -116,12 +116,12 @@ namespace LostWorlds
 
 		public static Area medow = new Area()
 		{
-			name = "Medow",
+			name = "Meadow",
 			firstVisitTime = 15 * Time.minute,
 			travelTime =15 * Time.minute,
 			returnTime = 15 * Time.minute,
-			firstVisitText = "You go off to the near-by medow and look around at all the lovely flowers and berry bushes. You can tell that there are probably plenty of eatable veggies around in this area if you decide to harvest them from the wild.",
-			text = "You return to the near-by medow and look around the place for a moment, thinking about what you should do. You still remember where all the good harvestable food stuffs are located in the medow.",
+			firstVisitText = "You go off to the near-by meadow and look around at all the lovely flowers and berry bushes. You can tell that there are probably plenty of eatable veggies around in this area if you decide to harvest them from the wild.",
+			text = "You return to the near-by meadow and look around the place for a moment, thinking about what you should do. You still remember where all the good harvestable foodstuffs are located in the meadow.",
 			options = new List<Area>()
 			{
 				harvest
