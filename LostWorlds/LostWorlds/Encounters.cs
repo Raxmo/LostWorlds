@@ -50,7 +50,7 @@ namespace LostWorlds
 		{
 			var temptext = "";
 
-            //maybe check whether Enemy is null and handle that for a good measure?
+            //maybe check whether Enemy is null and handle that for a good measure? <- I'm prety sure that this particular method will never trigger unless there is an enemy, so it not checking for a null Enemy is perfectly fine.
 			var edamage = Utils.Gaussian(Enemy.Stats.Attack, 15) - Characters.Player.Stats.Dodge;
 
 			if (edamage > 0)
@@ -69,7 +69,7 @@ namespace LostWorlds
 					temptext += "you recoil from the hit but are still able to fight. ";
 				}
 			}
-			else if (Math.Abs(edamage) < double.Epsilon) //proper way of comparing because of possible imprecision inherent to floating point numbers
+			else if (Math.Abs(edamage) < double.Epsilon) //proper way of comparing because of possible imprecision inherent to floating point numbers <- good point, though, this is one of those things that will statistically never happen, honestly not even sure why I evn put it in to be quite frank.
             {
 				temptext += "the enemy mearly grazes you. ";
 			}
@@ -83,7 +83,7 @@ namespace LostWorlds
 		private void AttackClicked(object sender, EventArgs e)
 		{
 			var temptext = "You lash out in an attack! ";
-		    //maybe check whether Enemy is null and handle that for a good measure?
+		    //maybe check whether Enemy is null and handle that for a good measure? <- this button will be deleted in the even that there is no enemy, so, the case of no enemy will never happen.
             var damage = Utils.Gaussian(Characters.Player.Stats.Attack, 15) - Enemy.Stats.Dodge;
 
 			if (damage > 0)
@@ -153,7 +153,7 @@ namespace LostWorlds
 			Location.Encounter = null;
 		}
 
-        //does not access any dynamic data, might as well be static
+        //does not access any dynamic data, might as well be static <- good point, will keep this in mind
 		private static void DiedClicked(object sender, EventArgs e)
 		{
 			Areas.Home.Load();
@@ -161,7 +161,7 @@ namespace LostWorlds
 
 		private void SurvivedClicked(object sender, EventArgs e)
 		{
-			Location?.Load(); // ?. checks whether left operand is null and if it is it stops the operation (null conditional)
+			Location?.Load(); // ?. checks whether left operand is null and if it is it stops the operation (null conditional) <- oh my god thank you! I was trying to figure out how exactly to use that.
 		}
 
 		public void Load()
@@ -178,7 +178,7 @@ namespace LostWorlds
 	{
 		public static Encounter Test = new Encounter()
 		{
-			Enemy = Enemies.Test,
+			Enemy = new Enemies.test(),
 			Text = "You've encountered a.... thing, it's a testing thing, don't read too far into it, but what do you do?",
 		};
 	}

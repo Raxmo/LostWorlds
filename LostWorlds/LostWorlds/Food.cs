@@ -12,7 +12,7 @@ namespace LostWorlds
 		public double Water;
 	}
 
-    //you never assign to those again, might as well be readonly...
+    //you never assign to those again, might as well be readonly... <- very good point, will remember for later.
 	public static class Foods
 	{
 		public static readonly Food Fish = new Food()

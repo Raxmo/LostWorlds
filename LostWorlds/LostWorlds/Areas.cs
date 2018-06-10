@@ -80,11 +80,8 @@ namespace LostWorlds
 				MainWindow.App.MainText.SelectAll();
 				MainWindow.App.MainText.Selection.Text = Text;
 			}
-            //this could be elegantly solved by null propagation using the null conditional ? would simply look like Encounter?.Load();
-            if (Encounter != null)
-			{
-				Encounter.Load();
-			}
+			//this could be elegantly solved by null propagation using the null conditional ? would simply look like Encounter?.Load(); <- thank you so much, I was trying to figure out how to use that actually.
+			Encounter?.Load();
 			MainWindow.App.Update();
 		}
 	}
