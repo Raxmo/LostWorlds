@@ -9,20 +9,27 @@ namespace LostWorlds
 	public class Enemy
 	{
 		public Stats Stats = new Stats();
+		public string Attack(Character target)
+		{
+			string temp = "triggered";
+			return temp;
+		}
 	}
-
-    //again the internal classes may be readonly, unless you intend to mutate during game...
+	
 	public static class Enemies
 	{
-		public static readonly Enemy Test = new Enemy()
+		public class test : Enemy //inheriting from the Enemy class so it can be used as a templait in encounters, rather than mutating them during run-time.
 		{
-			Stats = new Stats()
+			public test()
 			{
-				Damage = 0,
-				Attack = 85,
-				Dodge = 85,
-				Endurance = 85
+				this.Stats = new Stats()
+				{
+					Dodge = 85,
+					Endurance = 85,
+					Attack = 85,
+					Damage = 0
+				};
 			}
-		};
+		}
 	}
 }

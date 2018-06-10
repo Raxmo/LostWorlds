@@ -84,10 +84,14 @@ namespace LostWorlds
             if ((Pos | Pos) > Math.Pow(100 + Radius, 2)) //only display the sun if it is actually above the horizon
 			{
 				Circle.Stroke = Brushes.Transparent;
+				Circle.Fill = Brushes.Transparent;
+				Horizon.Fill = new SolidColorBrush(Color.FromRgb(20, 20, 30));
 			}
 			else
 			{
 				Circle.Stroke = Brushes.White;
+				Circle.Fill = Brushes.White;
+				Horizon.Fill = new SolidColorBrush(Color.FromRgb(40, 40, 100));
 			}
 			Circle.StrokeThickness = 3;
 			Circle.SetValue(Canvas.LeftProperty, (Pos + Origin).X - Radius);
@@ -147,20 +151,20 @@ namespace LostWorlds
 			Characters.Update();
 
 			PlayerHunger.Foreground = Characters.Player.HungerColor();
-			PlayerThurst.Foreground = Characters.Player.ThirstColor();
+			PlayerThirst.Foreground = Characters.Player.ThirstColor();
 			PartnerHunger.Foreground = Characters.Partner.HungerColor();
-			PartnerThurst.Foreground = Characters.Partner.ThirstColor();
+			PartnerThirst.Foreground = Characters.Partner.ThirstColor();
 			Tracker.Children.Clear();
 			Tracker.Children.Add(Sun.Horizon);
 			Sun.Draw();
 			Tracker.Children.Add(Sun.Circle);
-
+			
 			Time.Delta = 0;
 		}
 
 		private void button_Click(object sender, RoutedEventArgs e)
 		{
-            //.Any() would do it without comparison
+            //.Any() would do it without comparison <- how do you mean? not very familiar with C# to be frank, feel free to redo this code so I can see how to use that, seems a lot cleaner to me
 			if (Areas.Back.Count() > 0)
 			{
 				Time.Delta = Areas.Curr.TravelTime;
