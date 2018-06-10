@@ -8,22 +8,23 @@ namespace LostWorlds
 {
 	public class Food
 	{
-		public double energy;
-		public double water;
+		public double Energy;
+		public double Water;
 	}
 
+    //you never assign to those again, might as well be readonly... <- very good point, will remember for later.
 	public static class Foods
 	{
-		public static Food fish = new Food()
+		public static readonly Food Fish = new Food()
 		{
-			energy = 2.815,
-			water = 0.414
+			Energy = 2.815,
+			Water = 0.414
 		};
 
-		public static Food berries = new Food()
+		public static readonly Food Berries = new Food()
 		{
-			energy = 1.141,
-			water = 0.445
+			Energy = 1.141,
+			Water = 0.445
 		};
 	}
 }

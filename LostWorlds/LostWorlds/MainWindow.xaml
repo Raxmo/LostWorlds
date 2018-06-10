@@ -7,24 +7,24 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1080">
     <Grid Background="Black" Margin="0">
-        <RichTextBox x:Name="mainText" Margin="10,10,220,10" Background="Black" BorderBrush="White" Foreground="White" SelectionBrush="Gray" IsReadOnly="True" VerticalScrollBarVisibility="Visible" x:FieldModifier="public">
+        <RichTextBox x:Name="MainText" Margin="10,10,220,10" Background="Black" BorderBrush="White" Foreground="White" SelectionBrush="Gray" IsReadOnly="True" VerticalScrollBarVisibility="Visible" x:FieldModifier="public">
             <FlowDocument>
                 <Paragraph>
                     <Run Text="RichTextBox"/>
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
-        <Canvas x:Name="tracker" Margin="0,0,10,10" Height="200" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="200" Background="#FF1E1E1E"/>
-        <Label x:Name="years" Content="Year:" HorizontalAlignment="Right" Margin="0,10,115,0" VerticalAlignment="Top" Background="Black" Foreground="White" Width="95"/>
-        <Label x:Name="days" Content="Day:" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Background="Black" Foreground="White" Width="95"/>
-        <Label x:Name="label2" Content="Player" HorizontalAlignment="Right" Margin="0,41,115,0" Background="Black" Foreground="White" Width="95" Height="26" VerticalAlignment="Top"/>
-        <Label x:Name="label3" Content="Partner" HorizontalAlignment="Right" Margin="0,41,10,0" VerticalAlignment="Top" Width="95" Foreground="White" Background="Black"/>
-        <Label x:Name="playerHunger" Content="Hungry" HorizontalAlignment="Right" Margin="0,72,115,0" VerticalAlignment="Top" RenderTransformOrigin="-0.605,-1.327" Foreground="Black" Background="Black" Width="95"/>
-        <Label x:Name="partnerHunger" Content="Hungry" HorizontalAlignment="Right" Margin="0,72,10,0" VerticalAlignment="Top" Width="95" Foreground="Black"/>
-        <Label x:Name="playerThurst" Content="Thirsty" HorizontalAlignment="Right" Margin="0,103,115,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="Black"/>
-        <Label x:Name="partnerThurst" Content="Thirsty" HorizontalAlignment="Right" Margin="0,103,10,0" VerticalAlignment="Top" Width="95" Foreground="Black"/>
-        <Button x:Name="back" Content="Back" HorizontalAlignment="Right" Margin="0,134,115,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="White" BorderBrush="White" Click="button_Click"/>
-        <Grid x:Name="options" HorizontalAlignment="Right" Margin="0,159,10,0" VerticalAlignment="Top" Width="200" MinHeight="20" x:FieldModifier="public">
+        <Canvas x:Name="Tracker" Margin="0,0,10,10" Height="200" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="200" Background="Black"/>
+        <Label x:Name="Years" Content="Year:" HorizontalAlignment="Right" Margin="0,10,115,0" VerticalAlignment="Top" Background="Black" Foreground="White" Width="95"/>
+        <Label x:Name="Days" Content="Day:" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Background="Black" Foreground="White" Width="95"/>
+        <Label x:Name="Label2" Content="Player" HorizontalAlignment="Right" Margin="0,41,115,0" Background="Black" Foreground="White" Width="95" Height="26" VerticalAlignment="Top"/>
+        <Label x:Name="Label3" Content="Partner" HorizontalAlignment="Right" Margin="0,41,10,0" VerticalAlignment="Top" Width="95" Foreground="White" Background="Black"/>
+        <Label x:Name="PlayerHunger" Content="Hungry" HorizontalAlignment="Right" Margin="0,72,115,0" VerticalAlignment="Top" RenderTransformOrigin="-0.605,-1.327" Foreground="Black" Background="Black" Width="95"/>
+        <Label x:Name="PartnerHunger" Content="Hungry" HorizontalAlignment="Right" Margin="0,72,10,0" VerticalAlignment="Top" Width="95" Foreground="Black"/>
+        <Label x:Name="PlayerThirst" Content="Thirsty" HorizontalAlignment="Right" Margin="0,103,115,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="Black"/>
+        <Label x:Name="PartnerThirst" Content="Thirsty" HorizontalAlignment="Right" Margin="0,103,10,0" VerticalAlignment="Top" Width="95" Foreground="Black"/>
+        <Button x:Name="Back" Content="Back" HorizontalAlignment="Right" Margin="0,134,115,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="White" BorderBrush="White" Click="button_Click"/>
+        <Grid x:Name="Options" HorizontalAlignment="Right" Margin="0,159,10,0" VerticalAlignment="Top" Width="200" MinHeight="20" x:FieldModifier="public">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="Auto"/>
@@ -38,7 +38,7 @@
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
         </Grid>
-        <Button x:Name="home" Content="Go Home" HorizontalAlignment="Right" Margin="0,134,10,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="White" BorderBrush="White" Click="home_Click"/>
+        <Button x:Name="Home" Content="Go Home" HorizontalAlignment="Right" Margin="0,134,10,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="White" BorderBrush="White" Click="home_Click"/>
 
     </Grid>
 </Window>

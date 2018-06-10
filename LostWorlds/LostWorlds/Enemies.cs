@@ -8,20 +8,28 @@ namespace LostWorlds
 {
 	public class Enemy
 	{
-		public Stats stats = new Stats();
+		public Stats Stats = new Stats();
+		public string Attack(Character target)
+		{
+			string temp = "triggered";
+			return temp;
+		}
 	}
-
+	
 	public static class Enemies
 	{
-		public static Enemy test = new Enemy()
+		public class test : Enemy //inheriting from the Enemy class so it can be used as a templait in encounters, rather than mutating them during run-time.
 		{
-			stats = new Stats()
+			public test()
 			{
-				damage = 0,
-				attack = 85,
-				dodge = 85,
-				endurance = 85
+				this.Stats = new Stats()
+				{
+					Dodge = 85,
+					Endurance = 85,
+					Attack = 85,
+					Damage = 0
+				};
 			}
-		};
+		}
 	}
 }

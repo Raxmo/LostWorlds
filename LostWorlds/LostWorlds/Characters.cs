@@ -9,98 +9,89 @@ namespace LostWorlds
 {
 	public struct Stats
 	{
-		public double damage;
-		public double dodge;
-		public double endurance;
-		public double attack;
+		public double Damage;
+		public double Dodge;
+		public double Endurance;
+		public double Attack;
 	}
 
 	public class Character
 	{
-		public int hunger = 7500;
-		public int energy = 7500;
-		public int thirst = 3500;
-		public uint stomach = 500;
-		public uint capacity = 1000;
+		public int Hunger = 7500;
+		public int Energy = 7500;
+		public int Thirst = 3500;
+		public uint Stomach = 500;
+		public uint Capacity = 1000;
 
-		public Stats stats = new Stats()
+		public Stats Stats = new Stats()
 		{
-			damage = 0,
-			attack = 100,
-			dodge = 100,
-			endurance = 100
+			Damage = 0,
+			Attack = 100,
+			Dodge = 100,
+			Endurance = 100
 		};
 
-		public void update()
+		public void Update()
 		{
-			hunger -= (int)(Characters.hrate * Time.delta);
-			thirst -= (int)(Characters.trate * Time.delta);
-			stomach -= (uint)(Characters.srate * Time.delta);
-			stats.damage = Math.Max(0, stats.damage - Characters.drate * Time.delta);
+			Hunger -= (int)(Characters.Hrate * Time.Delta);
+			Thirst -= (int)(Characters.Trate * Time.Delta);
+			Stomach -= (uint)(Characters.Srate * Time.Delta);
+			Stats.Damage = Math.Max(0, Stats.Damage - Characters.Drate * Time.Delta);
 
 		}
 
-		public void eatDrink(uint food, uint water, uint volume)
+		public void EatDrink(uint food, uint water, uint volume)
 		{
-			hunger += (int)food;
-			thirst += (int)water;
-			stomach += volume;
+			Hunger += (int)food;
+			Thirst += (int)water;
+			Stomach += volume;
 		}
 
-		public void drink(uint water)
+		public void Drink(uint water)
 		{
-			thirst += (int)water;
-			capacity += water;
+			Thirst += (int)water;
+			Capacity += water;
 		}
 
-		public SolidColorBrush hungerColor()
+		public SolidColorBrush HungerColor()
 		{
-			byte col = (byte)(255 * Math.Pow(Math.E, -Math.Pow(hunger, 2) / Math.Pow(7500 / 3, 2))); //this logic plots hunger on a more accurate scale, that is asymtotic, so the entire number line maps to between 0, and 255. 7500 is the daily requirement in kJ for energy
+			var col = (byte)(255 * Math.Pow(Math.E, -Math.Pow(Hunger, 2) / Math.Pow(7500 / 3, 2))); //this logic plots hunger on a more accurate scale, that is asymtotic, so the entire number line maps to between 0, and 255. 7500 is the daily requirement in kJ for energy
 
-			if (hunger >= 0)
-			{
-				return new SolidColorBrush(Color.FromRgb(col, col, col));
-			}
-			else
-			{
-				return new SolidColorBrush(Color.FromRgb(255, col, col));
-			}
+			//ternary would be much nicer here, but some people don't like it, it would be return Hunger >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
+
+			//awesome! I don't mind ternary at all, it tends to clean things up quite nicely.
+
+			return Hunger >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
 		}
-		public SolidColorBrush thirstColor()
+		public SolidColorBrush ThirstColor()
 		{
-			byte col = (byte)(255 * Math.Pow(Math.E, -thirst * thirst / Math.Pow(3500 / 3, 2))); // This is a slightly different requirement, so, there is that. But hey, water is important as well, so, the player will be able to manage their water intake a little better, or more accurately, more accurately.
+			var col = (byte)(255 * Math.Pow(Math.E, -Thirst * Thirst / Math.Pow(3500 / 3, 2))); // This is a slightly different requirement, so, there is that. But hey, water is important as well, so, the player will be able to manage their water intake a little better, or more accurately, more accurately.
 
-			if (thirst >= 0)
-			{
-				return new SolidColorBrush(Color.FromRgb(col, col, col));
-			}
-			else
-			{
-				return new SolidColorBrush(Color.FromRgb(255, col, col));
-			}
+			//ternary would look like return Thirst >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
+			return Thirst >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
 		}
 	}
 
 	public static class Characters
 	{
-		public static double hrate = 7500 / Time.day;
-		public static double trate = 3500 / Time.day;
-		public static double srate = 1 / (4 * Time.hour);
-		public static double drate = 100 / Time.day;
+		public static double Hrate = 7500 / Time.Day;
+		public static double Trate = 3500 / Time.Day;
+		public static double Srate = 1 / (4 * Time.Hour);
+		public static double Drate = 100 / Time.Day;
 
-		public static Character player = new Character();
-		public static Character partner = new Character();
+		public static Character Player = new Character();
+		public static Character Partner = new Character();
 
-		public static List<Character> active = new List<Character>()
+		public static List<Character> Active = new List<Character>()
 		{
-			player
+			Player
 		};
 
-		public static void update()
+		public static void Update()
 		{
-			foreach(Character c in active)
+			foreach(var c in Active)
 			{
-				c.update();
+				c.Update();
 			}
 		}
 	}
