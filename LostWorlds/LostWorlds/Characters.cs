@@ -15,7 +15,7 @@ namespace LostWorlds
 		public double Attack;
 	}
 
-	public class Character
+	public class Character : Entity
 	{
 		public int Hunger = 7500;
 		public int Energy = 7500;
@@ -23,20 +23,22 @@ namespace LostWorlds
 		public uint Stomach = 500;
 		public uint Capacity = 1000;
 
-		public Stats Stats = new Stats()
+		public Character()
 		{
-			Damage = 0,
-			Attack = 100,
-			Dodge = 100,
-			Endurance = 100
-		};
+			stats = new Stats()
+			{
+				Attack = 100,
+				Dodge = 100,
+				Endurance = 100,
+			};
+		}
 
 		public void Update()
 		{
 			Hunger -= (int)(Characters.Hrate * Time.Delta);
 			Thirst -= (int)(Characters.Trate * Time.Delta);
 			Stomach -= (uint)(Characters.Srate * Time.Delta);
-			Stats.Damage = Math.Max(0, Stats.Damage - Characters.Drate * Time.Delta);
+			stats.Damage = Math.Max(0, stats.Damage - Characters.Drate * Time.Delta);
 
 		}
 
@@ -79,7 +81,49 @@ namespace LostWorlds
 		public static double Srate = 1 / (4 * Time.Hour);
 		public static double Drate = 100 / Time.Day;
 
-		public static Character Player = new Character();
+		public static Character Player = new Character()
+		{
+			AT = new Entity.attackText()
+			{
+				/*
+				attacking = "You strike out at the enemy, ",
+				hit = "and you manage to land a solid hit. ",
+				miss = "but you miss it completely. ",
+				death = "You pass out from the pain, only to wake up back at your home."
+				*/
+				attacking = new List<string>
+				{
+					"You strike out at the enemy, ",
+					"You rear back and jab at the enemy, ",
+					"You throw a nice kick towards the enemy "
+				},
+				hit = new List<string>
+				{
+					"and you manage to land a solid hit. ",
+					"landing a nice strike on the opponent. ",
+					"hitting squarely on your target. "
+				},
+				miss = new List<string>
+				{
+					"but you miss it completely. ",
+					"but you mearly graze the target, doing nothing. ",
+					"missing the target, leaving it unscathed. "
+				},
+				death = new List<string>
+				{
+					"You pass out from the pain, only to wake up back at your home.",
+					"The pain becomes too much for you, and you collapse into unconsiousness, waking up at your home.",
+					"You stumble back from the last hit, and drop to one knee as your vission collapses to a point, and fading into black. You wake up at your little home."
+				}
+			},
+			DT = new Entity.damageText()
+			{
+				unhurt = "You don't even have a scratch on you. ",
+				healthy = "You only have a few scrapes and bruizes on you. ",
+				damaged = "You are a bit roughed up right now, but you should be able to go a little longer. ",
+				critical = "You are in serious need of rest, you are bloodied and bruized, you really can't take much more abuse. "
+			}
+		};
 		public static Character Partner = new Character();
 
 		public static List<Character> Active = new List<Character>()
@@ -93,6 +137,6 @@ namespace LostWorlds
 			{
 				c.Update();
 			}
-		}
+		}		
 	}
 }

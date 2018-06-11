@@ -22,6 +22,62 @@ namespace LostWorlds
 	/// </summary>
 	/// 
 
+	public class Entity
+	{
+		public Stats stats = new Stats();
+		public bool isAlive = true;
+		public string name = "";
+		public string description = "";
+		public attackText AT = new attackText();
+		public damageText DT = new damageText();
+		public string init = "";
+
+		public struct damageText
+		{
+			public string unhurt; // damage = 0
+			public string healthy; // when damage is < endurance - 60
+			public string damaged; // when damage is < endurance
+			public string critical; // when damage is >= endurance
+		}
+
+		public struct attackText
+		{
+			public List<string> attacking;
+			public List<string> hit;
+			public List<string> miss;
+			public List<string> death;
+		}
+
+		public string HealthState()
+		{
+			if(stats.Damage == 0)
+			{
+				return DT.unhurt;
+			}
+			else if(stats.Damage < stats.Endurance - 60)
+			{
+				return DT.healthy;
+			}
+			else if(stats.Damage < stats.Endurance)
+			{
+				return DT.damaged;
+			}
+			else
+			{
+				return DT.critical;
+			}
+		}
+		
+		public string Attack(Entity target)
+		{
+			var tdamage = Math.Max(Utils.Gaussian(stats.Attack, 15) - target.stats.Dodge, 0);
+			target.stats.Damage += tdamage;
+			target.isAlive = Utils.Gaussian(target.stats.Damage, 15) < target.stats.Endurance;
+			return (tdamage > 0) ? AT.attacking[Utils.rand.Next(AT.attacking.Count)] + AT.hit[Utils.rand.Next(AT.hit.Count)]
+				: AT.attacking[Utils.rand.Next(AT.attacking.Count)] + AT.miss[Utils.rand.Next(AT.miss.Count)];
+		}		
+	}
+
 	public static class Time
 	{
 		public static uint T = 0;

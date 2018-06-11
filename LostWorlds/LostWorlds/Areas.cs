@@ -177,7 +177,11 @@ namespace LostWorlds
 				var tart = rand.NextDouble();
 				if (tart < 0.25)
 				{
-					Stream.Encounter = Encounters.Test;
+					Stream.Encounter = new Encounters.tester(); //not sure if this will lead to some memory leak issues during run-time, might want to check for that.
+				}
+				else
+				{
+					Stream.Encounter = null;
 				}
 			})
 		};

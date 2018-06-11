@@ -8,6 +8,8 @@ namespace LostWorlds
 {
 	public static class Utils
 	{
+		public static Random rand = new Random();
+
 		public static double Gaussian(double m, double d) //random numbers within normal distribution, don't ask how it works, don't care, it just does. it's probably something allong the lines of the derivative of cosine at 0 is similar to the derivative of the normal distribution and the edge casses look like negetive log function or something? not sure and again, don't really care.
 		{
 			var rand = new Random();

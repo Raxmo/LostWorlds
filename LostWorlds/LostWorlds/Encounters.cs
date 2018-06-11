@@ -11,7 +11,7 @@ namespace LostWorlds
 {
 	public class Encounter
 	{
-		public Enemy Enemy = new Enemy();
+		public Enemy enemy = new Enemy();
 		public string Text;
 		public Action Setup = null;
 		public Action Attack = null;
@@ -20,6 +20,8 @@ namespace LostWorlds
 
 		private void LoadActions()
 		{
+			MainWindow.App.Options.Children.Clear();
+
 			var attack = new Button();
 			var run = new Button();
 
@@ -46,140 +48,77 @@ namespace LostWorlds
 			Grid.SetRow(run, 0);
 		}
 
-		private string EnemyAttack()
+		private void LoadContinue()
 		{
-			var temptext = "";
+			MainWindow.App.Options.Children.Clear();
 
-            //maybe check whether Enemy is null and handle that for a good measure? <- I'm prety sure that this particular method will never trigger unless there is an enemy, so it not checking for a null Enemy is perfectly fine.
-			var edamage = Utils.Gaussian(Enemy.Stats.Attack, 15) - Characters.Player.Stats.Dodge;
+			var Continue = new Button();
 
-			if (edamage > 0)
-			{
-				temptext += "They land a good hit, damaging you in the prossess! ";
+			Continue.Content = "Continue";
+			Continue.Name = "ContinueB";
+			Continue.Foreground = Brushes.White;
+			Continue.Background = Brushes.Black;
+			Continue.BorderBrush = Brushes.White;
+			Continue.Click += new RoutedEventHandler(ContinueClicked);
 
-				Characters.Player.Stats.Damage += edamage;
-
-				if (Utils.Gaussian(Characters.Player.Stats.Endurance, 15) < Characters.Player.Stats.Damage && Utils.Gaussian(Characters.Player.Stats.Endurance, 15) < Characters.Player.Stats.Damage && Utils.Gaussian(Characters.Player.Stats.Endurance, 15) < Characters.Player.Stats.Damage)
-				{
-					temptext += "The pain of the hit become far too much, and you pass out, waking up at your little camp site. ";
-					Finish(false);
-				}
-				else
-				{
-					temptext += "you recoil from the hit but are still able to fight. ";
-				}
-			}
-			else if (Math.Abs(edamage) < double.Epsilon) //proper way of comparing because of possible imprecision inherent to floating point numbers <- good point, though, this is one of those things that will statistically never happen, honestly not even sure why I evn put it in to be quite frank.
-            {
-				temptext += "the enemy mearly grazes you. ";
-			}
-			else
-			{
-				temptext += "The enemy misses you completely! ";
-			}
-			return temptext;
+			MainWindow.App.Options.Children.Add(Continue);
+			Grid.SetColumn(Continue, 0);
+			Grid.SetRow(Continue, 0);
+			Grid.SetColumnSpan(Continue, 2);
 		}
-
+		
 		private void AttackClicked(object sender, EventArgs e)
 		{
-			var temptext = "You lash out in an attack! ";
-		    //maybe check whether Enemy is null and handle that for a good measure? <- this button will be deleted in the even that there is no enemy, so, the case of no enemy will never happen.
-            var damage = Utils.Gaussian(Characters.Player.Stats.Attack, 15) - Enemy.Stats.Dodge;
-
-			if (damage > 0)
-			{
-				temptext += "You manage to land the hit squarely, hurting the foe! ";
-				Enemy.Stats.Damage += damage;
-				if(Utils.Gaussian(Enemy.Stats.Endurance, 15) < Enemy.Stats.Damage)
-				{
-					temptext += "The foe reals back and collapses to the ground, motionless. ";
-					Finish(true);
-				}
-				else
-				{
-					temptext += "The foe recoils in pain but lashes out at you! ";
-					temptext += EnemyAttack();	
-				}
-			}
-			else if(Math.Abs(damage) < double.Epsilon)  //proper way of comparing because of possible imprecision inherent to floating point numbers
-            {
-				temptext += "You mearly graze the opponent, and they lash back at you!";
-				temptext += EnemyAttack();
-			}
-			else
-			{
-				temptext += "You completely miss the opponent, and they use this opportunity to counter with an attack of their own!";
-				temptext += EnemyAttack();
-			}
 			MainWindow.App.MainText.SelectAll();
-			MainWindow.App.MainText.Selection.Text = temptext;
-			Time.Delta = 6;
-			MainWindow.App.Update();
+			MainWindow.App.MainText.Selection.Text = Characters.Player.Attack(enemy) + (enemy.isAlive ? enemy.HealthState() + enemy.Attack(Characters.Player) : enemy.AT.death[Utils.rand.Next(enemy.AT.death.Count)]) + Characters.Player.HealthState();
+
+			// not sure if ther is a more elegant way of doing this, if there is, would be most appreciated if you could make it a thing ^-^, also, I wish there was a nand opperator T-T I don't think it would have been that hard to put in !& as an opperator to be honest...
+			if (! (enemy.isAlive && Characters.Player.isAlive)) 
+			{
+				LoadContinue();
+			}
 		}
 
 		private void RunClicked(object sender, EventArgs e)
 		{
-			Location.Encounter = null;
-			Time.Delta = Time.Hour * 4;
-			Location.Load();
+			Location?.Load();
 		}
 
-		private void Finish(bool survived)
+		private void ContinueClicked(object sender, EventArgs e)
 		{
-			MainWindow.App.Options.Children.Clear();
-            //initialisers are cleaner
-		    var finished = new Button
-		    {
-		        Content = "Continue",
-		        Name = "finished",
-		        Foreground = Brushes.White,
-		        Background = Brushes.Black,
-		        BorderBrush = Brushes.White
-		    };
-		    if(survived)
+			if(!Characters.Player.isAlive)
 			{
-				finished.Click += new RoutedEventHandler(SurvivedClicked);
+				Areas.Home.Load();
 			}
 			else
 			{
-				finished.Click += new RoutedEventHandler(DiedClicked);
+
+				Location?.Load();
 			}
-			MainWindow.App.Options.Children.Add(finished);
-			Grid.SetColumn(finished, 0);
-			Grid.SetRow(finished, 0);
-			Grid.SetColumnSpan(finished, 2);
-
-			Enemy.Stats.Damage = 0;
-			Location.Encounter = null;
-		}
-
-        //does not access any dynamic data, might as well be static <- good point, will keep this in mind
-		private static void DiedClicked(object sender, EventArgs e)
-		{
-			Areas.Home.Load();
-		}
-
-		private void SurvivedClicked(object sender, EventArgs e)
-		{
-			Location?.Load(); // ?. checks whether left operand is null and if it is it stops the operation (null conditional) <- oh my god thank you! I was trying to figure out how exactly to use that.
 		}
 
 		public void Load()
 		{
-			MainWindow.App.Options.Children.Clear();
 			LoadActions();
 			Location = Areas.Curr;
 			MainWindow.App.MainText.SelectAll();
-			MainWindow.App.MainText.Selection.Text = Text;
+			MainWindow.App.MainText.Selection.Text = enemy.init + " " + Characters.Player.HealthState();
 		}
 	}
 
 	public static class Encounters
 	{
+		public class tester : Encounter
+		{
+			public tester()
+			{
+				enemy = new Enemies.test();
+			}
+		}
+
 		public static Encounter Test = new Encounter()
 		{
-			Enemy = new Enemies.test(),
-			Text = "You've encountered a.... thing, it's a testing thing, don't read too far into it, but what do you do?",
+			enemy = new Enemies.test(),
 		};
 	}
 }
