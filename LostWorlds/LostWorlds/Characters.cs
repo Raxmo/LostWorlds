@@ -10,9 +10,13 @@ namespace LostWorlds
 	public struct Stats
 	{
 		public double Damage;
-		public double Dodge;
-		public double Endurance;
-		public double Attack;
+
+		public double Strength;
+		public double Dextarity;
+		public double Constitution;
+		public double Intelegence;
+		public double Wisdom;
+		public double Focus;
 	}
 
 	public class Character : Entity
@@ -23,14 +27,19 @@ namespace LostWorlds
 		public uint Stomach = 500;
 		public uint Capacity = 1000;
 
+		public Race race = Races.Human;
+
 		public Character()
 		{
-			stats = new Stats()
-			{
-				Attack = 100,
-				Dodge = 100,
-				Endurance = 100,
-			};
+			canLevel = true;
+			race.StatInit(this);
+			Console.WriteLine("Strength: " + stats.Strength);
+			Console.WriteLine("Constitution: " + stats.Constitution);
+			Console.WriteLine("Dextarity: " + stats.Dextarity);
+			Console.WriteLine("Intelegence: " + stats.Intelegence);
+			Console.WriteLine("Wisdom: " + stats.Wisdom);
+			Console.WriteLine("Focus: " + stats.Focus);
+
 		}
 
 		public void Update()
@@ -83,14 +92,10 @@ namespace LostWorlds
 
 		public static Character Player = new Character()
 		{
+			race = Races.Wolf,
+
 			AT = new Entity.attackText()
-			{
-				/*
-				attacking = "You strike out at the enemy, ",
-				hit = "and you manage to land a solid hit. ",
-				miss = "but you miss it completely. ",
-				death = "You pass out from the pain, only to wake up back at your home."
-				*/
+			{				
 				attacking = new List<string>
 				{
 					"You strike out at the enemy, ",

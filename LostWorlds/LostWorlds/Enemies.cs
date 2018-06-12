@@ -57,11 +57,16 @@ namespace LostWorlds
 					critical = "The thing is berally holding itself together, each part of it's body taking seconds to catch up to where it is supposed to be, and never syncronously. " 
 				};
 
+				knowlegeRateing = 85;
+
 				stats = new Stats()
 				{
-					Dodge = 85,
-					Endurance = 85,
-					Attack = 85,
+					Strength = 85,
+					Dextarity = 85,
+					Constitution = 85,
+					Intelegence = 85,
+					Wisdom = 85,
+					Focus = 85,
 					Damage = 0
 				};
 			}

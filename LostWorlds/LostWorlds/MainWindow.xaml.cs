@@ -32,12 +32,15 @@ namespace LostWorlds
 		public damageText DT = new damageText();
 		public string init = "";
 
+		public double knowlegeRateing = 100;
+		public bool canLevel = false;
+
 		public struct damageText
 		{
 			public string unhurt; // damage = 0
-			public string healthy; // when damage is < endurance - 60
-			public string damaged; // when damage is < endurance
-			public string critical; // when damage is >= endurance
+			public string healthy; // when damage is < constitution - 60
+			public string damaged; // when damage is < constitution
+			public string critical; // when damage is >= constitution
 		}
 
 		public struct attackText
@@ -54,11 +57,11 @@ namespace LostWorlds
 			{
 				return DT.unhurt;
 			}
-			else if(stats.Damage < stats.Endurance - 60)
+			else if(stats.Damage < stats.Constitution - 60)
 			{
 				return DT.healthy;
 			}
-			else if(stats.Damage < stats.Endurance)
+			else if(stats.Damage < stats.Constitution)
 			{
 				return DT.damaged;
 			}
@@ -70,9 +73,28 @@ namespace LostWorlds
 		
 		public string Attack(Entity target)
 		{
-			var tdamage = Math.Max(Utils.Gaussian(stats.Attack, 15) - target.stats.Dodge, 0);
+			var wdamage = Math.Max(Utils.Gaussian(stats.Wisdom, 15) - target.knowlegeRateing, 0);
+			stats.Wisdom += (wdamage == 0 && canLevel) ? Utils.Gaussian(stats.Intelegence, 15) / 100 : 0;
+			// TODO: allow the target enemy's knowlegeLevel be mutated at this point in some way or another. 
+			// Goal is to have a "target.GetClass().knowlegeLevel += [INSERT LOGIC HERE];" or some such thing.
+
+			var fdamage = Math.Max(Utils.Gaussian(stats.Focus, 15) - (target.stats.Dextarity - wdamage), 0);
+
+			var sdamage = Math.Max(Utils.Gaussian(stats.Strength, 15) - (target.stats.Constitution - wdamage), 0);
+			stats.Strength += Math.Max((Utils.Gaussian(100, 15) - stats.Strength) / 100, 0);
+
+			target.stats.Constitution += (target.canLevel) ? Math.Max((Utils.Gaussian(100, 15) - stats.Constitution) / 100, 0) : 0;
+
+			var tdamage = (fdamage > 0) ? fdamage : 0;
+			
 			target.stats.Damage += tdamage;
-			target.isAlive = Utils.Gaussian(target.stats.Damage, 15) < target.stats.Endurance;
+			target.isAlive = Utils.Gaussian(target.stats.Damage, 15) < target.stats.Constitution;
+			/*
+			 * When attatcking, are you smart enough to find the week point?
+			 * are you focused enough to hit the target?
+			 * are you strong enough to hurt the target?
+			 */
+
 			return (tdamage > 0) ? AT.attacking[Utils.rand.Next(AT.attacking.Count)] + AT.hit[Utils.rand.Next(AT.hit.Count)]
 				: AT.attacking[Utils.rand.Next(AT.attacking.Count)] + AT.miss[Utils.rand.Next(AT.miss.Count)];
 		}		
@@ -95,7 +117,7 @@ namespace LostWorlds
 		public static double Tilt = Math.PI * 20 / 180; //axial tilt of the planet
 		public static double TiltFase = 0; //this is the offset of the tilt relative to the orbital position
 		public static double Latitude = Math.PI * 45 / 180; //the current latitude of the viewer
-		public static double Eccentricity = 0.5; //TODO: actually impliment this. No idea quite how to impliment the varying day-length imposed by eccentricity of the orbit.
+		public static double Eccentricity = 0.5; //TODO: actually impliment this. No idea quite how to impliment the varying day-length imposed by eccentricity of the orbit. will likely have to use integrals for this, which will be not fun.
 
 
 		public static Utils.Vec Origin = new Utils.Vec(100, 100);

@@ -58,6 +58,7 @@
     <Compile Include="Encounters.cs" />
     <Compile Include="Enemies.cs" />
     <Compile Include="Food.cs" />
+    <Compile Include="Races.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
