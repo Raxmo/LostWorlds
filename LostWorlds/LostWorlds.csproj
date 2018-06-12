@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D8B482FF-7783-4A73-863F-ACDDF202F963}</ProjectGuid>
+    <ProjectGuid>{C62E08A8-3AE6-4A98-A10F-095A75414008}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>LostWorlds</RootNamespace>
     <AssemblyName>LostWorlds</AssemblyName>
@@ -54,6 +54,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Characters.cs" />
+    <Compile Include="Encounters.cs" />
+    <Compile Include="Enemies.cs" />
+    <Compile Include="Food.cs" />
+    <Compile Include="Races.cs" />
+    <Compile Include="Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -62,6 +68,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Areas.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
