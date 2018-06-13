@@ -11,6 +11,7 @@ using System.Windows;
 /*
  * TODO:
  * The areas seem mostly fine, there might be a better way to structure them, but not entirely sure what that is quite yet.
+ * should probably completely refactor code to use the new Event class instead of the messy logic in here.
  */
 
 namespace LostWorlds
@@ -19,25 +20,22 @@ namespace LostWorlds
 	{
 		public List<Area> Options = new List<Area>();
 		public Encounter Encounter = null;
-		public bool CanLoadOptions = true;
+		public Event Event = null;
 		public string Name;
-		public string Text;
-		public uint TravelTime;
-		public uint ActionTime;
-		public uint ReturnTime;
+		public string Text = "";
+		public uint TravelTime = 0;
+		public uint ActionTime = 0;
+		public uint ReturnTime = 0;
 		public bool IsFirstVisit = true;
-		public uint FirstVisitTime;
-		public string FirstVisitText;
+		public uint FirstVisitTime = 0;
+		public string FirstVisitText = "";
 		public Action Act = null;
 		public double Hrate = 7500;
 		public double Trate = 3500;
 
 		private void LoadOptions()
 		{
-			if(CanLoadOptions)
-			{
-				MainWindow.App.Options.Children.Clear();
-			}			
+			MainWindow.App.Options.Children.Clear();			
 			if (Options.Count > 0 && Options != null)
 			{
 				for (var i = 0; i < Options.Count(); i++)
@@ -72,6 +70,7 @@ namespace LostWorlds
 			Areas.Curr = this;
 			Act?.Invoke();
 			LoadOptions();
+			
 
 			Time.Delta += ActionTime;
 			Characters.Hrate = Hrate / Time.Day;
@@ -90,6 +89,7 @@ namespace LostWorlds
 				MainWindow.App.MainText.Selection.Text = Text;
 			}
 			//this could be elegantly solved by null propagation using the null conditional ? would simply look like Encounter?.Load(); <- thank you so much, I was trying to figure out how to use that actually.
+			Event?.Load();
 			Encounter?.Load();
 			MainWindow.App.Update();
 		}
@@ -102,6 +102,7 @@ namespace LostWorlds
 		// You'll need to list the areas in reverse order, due to limitations in hoisting, the FIRST area needs to be at the BOTTOM, and the FARTHEST area needs to be at the TOP.
 
         //all of these could probably be made readonly <- most areas will need to mutate depending on if the player had visited the area before or not.
+		
 		public static Area Harvest = new Area()
 		{
 			Name = "Harvest",
@@ -328,107 +329,12 @@ namespace LostWorlds
 			}
 		};
 		
-		//should refactor character creation to become what will be events, to clean up the areas code more, and to facilitate other situations that might happen
-
-		//choosing the players race
-		public static Area PlayerRace = new Area()
-		{
-			Name = "",
-			ActionTime = 0,
-			FirstVisitTime = 0,
-			TravelTime = 0,
-			IsFirstVisit = false,
-			Text = "What is your race?",
-			CanLoadOptions = false,
-			Act = (() =>
-			{
-				var human = new Button();
-				var wolf = new Button();
-
-				human.Content = "Human";
-				human.Foreground = Brushes.White;
-				human.Background = Brushes.Black;
-				human.BorderBrush = Brushes.White;
-				human.Click += new RoutedEventHandler(HumanClicked); // is there a way to do this without external methods? I'd prefer to not use them, just because it seems a little messier to me
-
-				wolf.Content = "Wolf";
-				wolf.Foreground = Brushes.White;
-				wolf.Background = Brushes.Black;
-				wolf.BorderBrush = Brushes.White;
-				wolf.Click += new RoutedEventHandler(WolfClicked);
-
-				MainWindow.App.Options.Children.Clear();
-
-				MainWindow.App.Options.Children.Add(human);
-				Grid.SetColumn(human, 0);
-				Grid.SetRow(human, 0);
-
-				MainWindow.App.Options.Children.Add(wolf);
-				Grid.SetColumn(wolf, 1);
-				Grid.SetRow(wolf, 0);
-			})
-		};
-		public static void HumanClicked(object sender, EventArgs e)
-		{
-			Characters.Player.race = Races.Human;
-			Characters.Player.race.StatInit(Characters.Player);
-			Starting.Load();
-		}
-		public static void WolfClicked(object sender, EventArgs e)
-		{
-			Characters.Player.race = Races.Wolf;
-			Characters.Player.race.StatInit(Characters.Player);
-			Starting.Load();
-		}
-
 		//choosing the player's gender
 		public static Area PlayerGender = new Area()
 		{
 			Name = "Creation",
-			ActionTime = 0,
-			FirstVisitTime = 0,
-			TravelTime = 0,
-			IsFirstVisit = false,
-			Text = "What is your gender?",
-			CanLoadOptions = false,
-			Act = (() =>
-			{
-				var male = new Button();
-				var female = new Button();
-
-				male.Content = "Male";
-				male.Foreground = Brushes.White;
-				male.Background = Brushes.Black;
-				male.BorderBrush = Brushes.White;
-				male.Click += new RoutedEventHandler(MaleClicked); // is there a way to do this without external methods? I'd prefer to not use them, just because it seems a little messier to me
-
-				female.Content = "Female";
-				female.Foreground = Brushes.White;
-				female.Background = Brushes.Black;
-				female.BorderBrush = Brushes.White;
-				female.Click += new RoutedEventHandler(FemaleClicked);
-
-				MainWindow.App.Options.Children.Clear();
-
-				MainWindow.App.Options.Children.Add(male);
-				Grid.SetColumn(male, 0);
-				Grid.SetRow(male, 0);
-
-				MainWindow.App.Options.Children.Add(female);
-				Grid.SetColumn(female, 1);
-				Grid.SetRow(female, 0);
-			})
+			Event = Events.PlayerGender
 		};
-		public static void MaleClicked(object sender, EventArgs e)
-		{
-			Characters.Player.gender = Genders.Male;
-			PlayerRace.Load();
-		}
-		public static void FemaleClicked(object sender, EventArgs e)
-		{
-			Characters.Player.gender = Genders.Female;
-			PlayerRace.Load();
-		}
 
 		public static Area Start = new Area()
 		{

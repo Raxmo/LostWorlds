@@ -66,12 +66,12 @@ namespace LostWorlds
 
 				stats = new Stats()
 				{
-					Strength = 85,
-					Dextarity = 85,
-					Constitution = 85,
-					Intelegence = 85,
-					Wisdom = 85,
-					Focus = 85,
+					Strength = 100,
+					Dextarity = 100,
+					Constitution = 100,
+					Intelegence = 100,
+					Wisdom = 100,
+					Focus = 100,
 					Damage = 0
 				};
 			}

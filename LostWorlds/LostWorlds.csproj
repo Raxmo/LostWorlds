@@ -57,6 +57,7 @@
     <Compile Include="Characters.cs" />
     <Compile Include="Encounters.cs" />
     <Compile Include="Enemies.cs" />
+    <Compile Include="Events.cs" />
     <Compile Include="Food.cs" />
     <Compile Include="Races.cs" />
     <Compile Include="Utils.cs" />
