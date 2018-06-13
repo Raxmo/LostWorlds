@@ -4,6 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * TODO:
+ * Enemies are fine for now, everything seems to be doing just well enough, however, figuring out a way to have per-type knowledge rating rather than per instance knowledge rating would be ideal.
+ */
+
 namespace LostWorlds
 {
 	public class Enemy : Entity

@@ -15,12 +15,58 @@ using System.Windows.Shapes;
 using System.Drawing;
 using System.Dynamic;
 
+/*
+ * TODO:
+ * This is one mess of code, but everything is fine the way it is for now. might re-work it a little later.
+ * Might end up adding in a physical map, will think about how to impliment it and decide on that later.
+ */
+
 namespace LostWorlds
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	/// 
+
+	public class Gender
+	{
+		public Stats mod = new Stats();
+	}
+	public static class Genders
+	{
+		/*
+		 * men build more muscle mass, and have faster knee-jerk reactions
+		 * women have higher pain tolerences and stay more cognitive than men, and also tend to be more dexterouse than men
+		 * 
+		 * this will be very difficult to properly model... and I'll be working on this for quite some time.
+		 */
+
+		public static Gender Male = new Gender()
+		{
+			mod = new Stats()
+			{
+				Strength = 15,
+				Constitution = 0,
+				Dextarity = 0,
+				Intelegence = 0,
+				Focus = -15,
+				Wisdom = 0,
+			}
+		};
+
+		public static Gender Female = new Gender()
+		{
+			mod = new Stats()
+			{
+				Strength = -15,
+				Constitution = 15,
+				Dextarity = 0,
+				Intelegence = 0,
+				Focus = 0,
+				Wisdom = 0,
+			}
+		};
+	}
 
 	public class Entity
 	{
@@ -34,6 +80,7 @@ namespace LostWorlds
 
 		public double knowlegeRateing = 100;
 		public bool canLevel = false;
+		public Gender gender = new Gender();
 
 		public struct damageText
 		{
@@ -76,7 +123,7 @@ namespace LostWorlds
 			var wdamage = Math.Max(Utils.Gaussian(stats.Wisdom, 15) - target.knowlegeRateing, 0);
 			stats.Wisdom += (wdamage == 0 && canLevel) ? Utils.Gaussian(stats.Intelegence, 15) / 100 : 0;
 			// TODO: allow the target enemy's knowlegeLevel be mutated at this point in some way or another. 
-			// Goal is to have a "target.GetClass().knowlegeLevel += [INSERT LOGIC HERE];" or some such thing.
+			// Goal is to have a "target.GetClass().knowlegeLevel -= [INSERT LOGIC HERE];" or some such thing.
 
 			var fdamage = Math.Max(Utils.Gaussian(stats.Focus, 15) - (target.stats.Dextarity - wdamage), 0);
 

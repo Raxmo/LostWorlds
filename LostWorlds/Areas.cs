@@ -8,12 +8,18 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
 
+/*
+ * TODO:
+ * The areas seem mostly fine, there might be a better way to structure them, but not entirely sure what that is quite yet.
+ */
+
 namespace LostWorlds
 {
 	public class Area
 	{
 		public List<Area> Options = new List<Area>();
 		public Encounter Encounter = null;
+		public bool CanLoadOptions = true;
 		public string Name;
 		public string Text;
 		public uint TravelTime;
@@ -28,7 +34,10 @@ namespace LostWorlds
 
 		private void LoadOptions()
 		{
-			MainWindow.App.Options.Children.Clear();
+			if(CanLoadOptions)
+			{
+				MainWindow.App.Options.Children.Clear();
+			}			
 			if (Options.Count > 0 && Options != null)
 			{
 				for (var i = 0; i < Options.Count(); i++)
@@ -92,14 +101,7 @@ namespace LostWorlds
 
 		// You'll need to list the areas in reverse order, due to limitations in hoisting, the FIRST area needs to be at the BOTTOM, and the FARTHEST area needs to be at the TOP.
 
-		/*
-		 * Each area is stored here there is a particular way to set them up however
-		 * 
-		 * name = the name that is displayed on the button to go to this particular area/menue
-		 * 
-		 */
-
-        //all of these could probably be made readonly
+        //all of these could probably be made readonly <- most areas will need to mutate depending on if the player had visited the area before or not.
 		public static Area Harvest = new Area()
 		{
 			Name = "Harvest",
@@ -256,6 +258,7 @@ namespace LostWorlds
 			})
 		};
 
+		// should overhaul the sleeping requirements, would be interesting to have different sleeping schedules and have sleep hinder your capabilities
 		public static Area Sleep = new Area()
 		{
 			Name = "Sleep",
@@ -267,6 +270,7 @@ namespace LostWorlds
 			Text = "You decide to sleep for the next 8 hours or so. You wake up well rested, and when the time comes for it, you would have saved as well, but that's currently not a thing yet, come back later for that one."
 		};
 
+		//the home description could use a little work
 		public static Area Home = new Area()
 		{
 			Name = "Home",
@@ -310,6 +314,122 @@ namespace LostWorlds
 			})
 		};
 
+		public static Area Starting = new Area()
+		{
+			Name = "Starting",
+			TravelTime = 0,
+			IsFirstVisit = false,
+			ReturnTime = 0,
+			FirstVisitTime = 0,
+			Text = "You look down at yourself and nod, seeing as your body is as it should. You look out and the world slowly comes into focus, only thing to do now is go on and live your new life.",
+			Options = new List<Area>()
+			{
+				Home
+			}
+		};
+		
+		//should refactor character creation to become what will be events, to clean up the areas code more, and to facilitate other situations that might happen
+
+		//choosing the players race
+		public static Area PlayerRace = new Area()
+		{
+			Name = "",
+			ActionTime = 0,
+			FirstVisitTime = 0,
+			TravelTime = 0,
+			IsFirstVisit = false,
+			Text = "What is your race?",
+			CanLoadOptions = false,
+			Act = (() =>
+			{
+				var human = new Button();
+				var wolf = new Button();
+
+				human.Content = "Human";
+				human.Foreground = Brushes.White;
+				human.Background = Brushes.Black;
+				human.BorderBrush = Brushes.White;
+				human.Click += new RoutedEventHandler(HumanClicked); // is there a way to do this without external methods? I'd prefer to not use them, just because it seems a little messier to me
+
+				wolf.Content = "Wolf";
+				wolf.Foreground = Brushes.White;
+				wolf.Background = Brushes.Black;
+				wolf.BorderBrush = Brushes.White;
+				wolf.Click += new RoutedEventHandler(WolfClicked);
+
+				MainWindow.App.Options.Children.Clear();
+
+				MainWindow.App.Options.Children.Add(human);
+				Grid.SetColumn(human, 0);
+				Grid.SetRow(human, 0);
+
+				MainWindow.App.Options.Children.Add(wolf);
+				Grid.SetColumn(wolf, 1);
+				Grid.SetRow(wolf, 0);
+			})
+		};
+		public static void HumanClicked(object sender, EventArgs e)
+		{
+			Characters.Player.race = Races.Human;
+			Characters.Player.race.StatInit(Characters.Player);
+			Starting.Load();
+		}
+		public static void WolfClicked(object sender, EventArgs e)
+		{
+			Characters.Player.race = Races.Wolf;
+			Characters.Player.race.StatInit(Characters.Player);
+			Starting.Load();
+		}
+
+		//choosing the player's gender
+		public static Area PlayerGender = new Area()
+		{
+			Name = "Creation",
+			ActionTime = 0,
+			FirstVisitTime = 0,
+			TravelTime = 0,
+			IsFirstVisit = false,
+			Text = "What is your gender?",
+			CanLoadOptions = false,
+			Act = (() =>
+			{
+				var male = new Button();
+				var female = new Button();
+
+				male.Content = "Male";
+				male.Foreground = Brushes.White;
+				male.Background = Brushes.Black;
+				male.BorderBrush = Brushes.White;
+				male.Click += new RoutedEventHandler(MaleClicked); // is there a way to do this without external methods? I'd prefer to not use them, just because it seems a little messier to me
+
+				female.Content = "Female";
+				female.Foreground = Brushes.White;
+				female.Background = Brushes.Black;
+				female.BorderBrush = Brushes.White;
+				female.Click += new RoutedEventHandler(FemaleClicked);
+
+				MainWindow.App.Options.Children.Clear();
+
+				MainWindow.App.Options.Children.Add(male);
+				Grid.SetColumn(male, 0);
+				Grid.SetRow(male, 0);
+
+				MainWindow.App.Options.Children.Add(female);
+				Grid.SetColumn(female, 1);
+				Grid.SetRow(female, 0);
+			})
+		};
+		public static void MaleClicked(object sender, EventArgs e)
+		{
+			Characters.Player.gender = Genders.Male;
+			PlayerRace.Load();
+		}
+		public static void FemaleClicked(object sender, EventArgs e)
+		{
+			Characters.Player.gender = Genders.Female;
+			PlayerRace.Load();
+		}
+
 		public static Area Start = new Area()
 		{
 			Name = "Opening",
@@ -320,7 +440,7 @@ namespace LostWorlds
 			IsFirstVisit = false,
 			Options = new List<Area>()
 			{
-				Home
+				PlayerGender
 			}
 		};
 

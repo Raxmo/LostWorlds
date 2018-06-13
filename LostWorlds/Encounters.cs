@@ -7,6 +7,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
+/*
+ * TODO:
+ * Encounters seem fine for now, might work on it later on, but shouldn't need anything else for the time being
+ */
+
 namespace LostWorlds
 {
 	public class Encounter

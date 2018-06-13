@@ -4,6 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * TODO:
+ * I should add in more foods, and expand on dietary needs. I should also make the variouse races have variable dietary needs
+ */
+
 namespace LostWorlds
 {
 	public class Food

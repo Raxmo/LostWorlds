@@ -5,6 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
+/*
+ * TODO:
+ * no work needs to be done here quite yet, will need to create an NPC class at some point, and also handle the partner logic.
+ */
+
 namespace LostWorlds
 {
 	public struct Stats
@@ -32,13 +37,6 @@ namespace LostWorlds
 		public Character()
 		{
 			canLevel = true;
-			race.StatInit(this);
-			Console.WriteLine("Strength: " + stats.Strength);
-			Console.WriteLine("Constitution: " + stats.Constitution);
-			Console.WriteLine("Dextarity: " + stats.Dextarity);
-			Console.WriteLine("Intelegence: " + stats.Intelegence);
-			Console.WriteLine("Wisdom: " + stats.Wisdom);
-			Console.WriteLine("Focus: " + stats.Focus);
 
 		}
 
@@ -92,8 +90,6 @@ namespace LostWorlds
 
 		public static Character Player = new Character()
 		{
-			race = Races.Wolf,
-
 			AT = new Entity.attackText()
 			{				
 				attacking = new List<string>
