@@ -12,15 +12,31 @@ using System.Windows.Media;
 
 namespace LostWorlds
 {
+
+	/* Overhaul stats
+	 * 
+	 * Strength           +Male
+	 * Pain Tolerance     +Female
+	 * flexibility        +female
+	 * fine moter skills  +male
+	 * Analysis           +female
+	 * Reflex             +male
+	 * Intelegence        -----
+	 * Knowledge          -----
+	 * Focus              -----
+	 */
 	public struct Stats
 	{
 		public double Damage;
 
 		public double Strength;
-		public double Dextarity;
-		public double Constitution;
+		public double PainTolerance;
+		public double Flexibility;
+		public double FineMoter;
+		public double Analysis;
+		public double Reflex;
 		public double Intelegence;
-		public double Wisdom;
+		public double Knowledge;
 		public double Focus;
 	}
 

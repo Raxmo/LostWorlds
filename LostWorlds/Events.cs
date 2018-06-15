@@ -66,79 +66,131 @@ namespace LostWorlds
 			{
 				Characters.Player.race.StatInit(Characters.Player);
 
+				/* set up for stat brackets
+				 * 
+				 * < 40 : legendarily low
+				 * < 55 : incredibly low
+				 * < 70 : far lower
+				 * < 85 : lower
+				 * < 115 : average
+				 * < 130 : higher
+				 * < 145 : far higher
+				 * < 160 : incredibly high
+				 * else : legendarily high
+				 * 
+				temp +=
+				(Characters.Player.stats.Strength < 40) ? " ":
+				(Characters.Player.stats.Strength < 55) ? " ":
+				(Characters.Player.stats.Strength < 70) ? " ":
+				(Characters.Player.stats.Strength < 85) ? " ":
+				(Characters.Player.stats.Strength < 115) ? " ":
+				(Characters.Player.stats.Strength < 130) ? " ":
+				(Characters.Player.stats.Strength < 145) ? " ":
+				(Characters.Player.stats.Strength < 160) ? " ":
+				" ";
+				 */
+
 				string temp = "You look over yourself and asses your abilities. ";
 
 				temp +=
-				(Characters.Player.stats.Strength < 40) ? "You are abismally week, it's a wonder you can even move with how little muscle mass you have. " :
-				(Characters.Player.stats.Strength < 55) ? "You are greatly weaker than most, you won't be doing much lifting. " :
-				(Characters.Player.stats.Strength < 70) ? "You are far weaker than most, it'll be hard to do any lifting, or even hurting anything. " :
-				(Characters.Player.stats.Strength < 85) ? "You are weaker than most, you'll still be able to do things, it'll just be harder than most others. " :
-				(Characters.Player.stats.Strength < 100) ? "You are about average in strength, mybe a slightly weaker than most. " :
-				(Characters.Player.stats.Strength < 115) ? "You are about average, maybe slightly stronger than most. " :
-				(Characters.Player.stats.Strength < 130) ? "You are stronger than most, you'll be able to do more lifting, and your punches are going to hurt more. " :
-				(Characters.Player.stats.Strength < 145) ? "You are far stronger than most, you'll be able to lift and carry things without problem, and you'll do quite some damage with a simple punch. " :
-				(Characters.Player.stats.Strength < 160) ? "You are gratly stronger than most, lifting and hurting things will be absolutely no problem at all" :
-				"Your strength is a thing of legends. Moving boulders, killing things in a single punch, all of these things are in your future. ";
+				(Characters.Player.stats.Strength < 40) ? "Your lack of strength is a thing of legends, you have none to speek of. You probably have a form of Mucular Distrophy, you won't be doing a whole lot. " :
+				(Characters.Player.stats.Strength < 55) ? "You have incredibly low strength, you can't even pull yourself up onto a ledge, your punches are tickles. " :
+				(Characters.Player.stats.Strength < 70) ? "you have far lower strength than most, you can still pull yourself up, but not much else. You won't be hurting anything any time soon, that's for sure. " :
+				(Characters.Player.stats.Strength < 85) ? "You have a lower strength than most, even when you flex, you can still easily squeeze your muscles, it'll be hard for you to carry much of anything. You should fight smarter, not harder. " :
+				(Characters.Player.stats.Strength < 115) ? "Your strength is average, nothing special here. " :
+				(Characters.Player.stats.Strength < 130) ? "You have above average strength, you can carry things easier than most, and hop up ledges with ease. " :
+				(Characters.Player.stats.Strength < 145) ? "You have far higher strength than the average person, your punches hurt, and you can carry much heavier loads than most. " :
+				(Characters.Player.stats.Strength < 160) ? "You have incredibly high strength, moving boulders, carying others comes easy to you. " :
+				"your strength is a thing of legend, anyone who pisses you off will not be conciouse for long, if they are lucky enough to be alive. ";
 
 				temp +=
-				(Characters.Player.stats.Constitution < 40) ? "Your lack of constitution is a medical mystery, or maybe a statistical anomoly. You'll likely blead out from a splinter, don't get bruized, because you might just die. " :
-				(Characters.Player.stats.Constitution < 55) ? "Your constitution falls greatly below the average, you'll have a hard time dealing with pain and could die quite easily. " :
-				(Characters.Player.stats.Constitution < 70) ? "Your constitution is far less than most indaviduals, you'll get sick easily, have a hard time runing for long periods of time, and will go down rather easily, danger is in your future. " :
-				(Characters.Player.stats.Constitution < 85) ? "Your constitution is less, you won't be able to run as far, or take as many hits. " :
-				(Characters.Player.stats.Constitution < 100) ? "Your constitution is about average, maybe slightly less than most. " :
-				(Characters.Player.stats.Constitution < 115) ? "Your constitution is about average, maybe only slightly higher than most. " :
-				(Characters.Player.stats.Constitution < 130) ? "your constitution is higher than most, you'll be able to run farther and take more hits and shrug off pain easier. " :
-				(Characters.Player.stats.Constitution < 145) ? "Your constitution is far higher than average, sickness and pain is not a common idea to you, and getting tired from running long distances is an acheivement in your case. " :
-				(Characters.Player.stats.Constitution < 160) ? "Your constitution greatly exceeds your peers, you'll be the one to last the longest in a distance run, it'll be quite hard to take you down, pain nearly doesn't even register with you. " :
-				"Your contitution is legendary, a medical miricle, you'll likely never get sick, you'll be able to run a marathon without even breaking a sweat, nearly loose limbs and still be perfectly fine. ";
+				(Characters.Player.stats.PainTolerance < 40) ? "You have no tolerance for pain, even stubbing your toe could knock you out. It is truely legendary how little you can tolerate pain. " :
+				(Characters.Player.stats.PainTolerance < 55) ? "Your pain tolerance is incredibly low, a single punch could take you down, you should be careful out there. " :
+				(Characters.Player.stats.PainTolerance < 70) ? "Your tolerance for pain is far lower than most, you'll go down easily, so watch your step. " :
+				(Characters.Player.stats.PainTolerance < 85) ? "Your pain tolerance is lower than most, it's not detrimental, but you should still be a little more careful. " :
+				(Characters.Player.stats.PainTolerance < 115) ? "You have an average pain tolerance. " :
+				(Characters.Player.stats.PainTolerance < 130) ? "Your pain tolerance is higher than most, it'll take a little more to knock you out. " :
+				(Characters.Player.stats.PainTolerance < 145) ? "Your pain tolerance is far higher than most, you'll shrug off damage like it's a flick in many casses. " :
+				(Characters.Player.stats.PainTolerance < 160) ? "Your pain tolerance is incredibly high, it'll take quite the event to take you down. " :
+				"You have a legendary pain tolerance, you'll laugh off even massive hits. ";
 
 				temp +=
-				(Characters.Player.stats.Dextarity < 40) ? "It's a wonder that you can even move with how bad your dextarity is, a literal wooden board is more limber than you are, good luck dodging, you are going to need it. " :
-				(Characters.Player.stats.Dextarity < 55) ? "Your dextarity falls greatly below the norm, you can move, but only barely, it'll be nearly impossible for you to dodge much of anything in your condition. " :
-				(Characters.Player.stats.Dextarity < 70) ? "Your dextarity is far below the average, you strugle to turn your head, can't do any kind of fine motar skills, and you are about as hard to hit as a barn door. " :
-				(Characters.Player.stats.Dextarity < 85) ? "You are less dextrous than your peers, you'll be easier to hit, and will have a harder time doing precise work on much of anything. " :
-				(Characters.Player.stats.Dextarity < 100) ? "Your dextarity is about average, maybe slightly less than most. " :
-				(Characters.Player.stats.Dextarity < 115) ? "Your dextarity is about average, maybe slightly more than most. " :
-				(Characters.Player.stats.Dextarity < 130) ? "Your dextarity is higher than most, you'll be harder to hit, and will have an easier time dodging and doing fine motar skills. " :
-				(Characters.Player.stats.Dextarity < 145) ? "Your dextarity is far higher than your peers, you'll be incredibly hard to hit, you're a fine candidate for surgury on even the smallest of creatures. " :
-				(Characters.Player.stats.Dextarity < 160) ? "Your dextarity is greatly above your peers, you are at the level of a contortionist, it'll be hard to keep you trapped, or hold onto you for any length of time. " :
-				"Your dextarity is legendary, you could eassily kiss your own ass if you wanted to, you are the slipperiest of the slippery, it's nearly impossible to hit you. ";
+				(Characters.Player.stats.Flexibility < 40) ? "Your lack of flexibility is legendary. A literal wooden board is more limber than you are. You won't be dodging anything any time soon. " :
+				(Characters.Player.stats.Flexibility < 55) ? "Your flexibility is incredibly lower than most. you can just about turn your head maybe 5 degrees, and not much else. Get used to pain, enemies will hit you often. " :
+				(Characters.Player.stats.Flexibility < 70) ? "You are far less flexible than most, you can turn your head, but not much else. You'll be easier to hit. " :
+				(Characters.Player.stats.Flexibility < 85) ? "You are less flexible than most, your movements aren't that great, so don't go trying to do any parkour, and don't get frustrated if you get hit a lot. " :
+				(Characters.Player.stats.Flexibility < 115) ? "You have average flexibility, nothing to brag about, but nothing to be sad about. " :
+				(Characters.Player.stats.Flexibility < 130) ? "Your flexibility is higher than most, you are a slippery one, but don't let it get to your head. " :
+				(Characters.Player.stats.Flexibility < 145) ? "You have far higher flexibility, you are quite slippery and hard to hit. " :
+				(Characters.Player.stats.Flexibility < 160) ? "You have incredible flexibility, near contortionist status in fact. It'll be hard for you to get stuck in small places or for someone to hold onto you for any amount of time. " :
+				"You have legendary flexibility, nearly impossible to hit, won't get trapped, you are seriously a thing of legend, contortionists don't even have a dream of being as flexible as you. You could literally kiss your own ass if you so pleased. ";
 
 				temp +=
-				(Characters.Player.stats.Intelegence < 40) ? "You probably have Lissencephaly, a rare condition that that prevents your brain from developing properly, and most indaviduals with this condition don't see the age of 10. " :
-				(Characters.Player.stats.Intelegence < 55) ? "Your intelegence falls greatly below the average, you likely have a rare condition that prevents your brain from having ripples, giving you a literal smooth brain. You really can't learn anything, ever. " :
-				(Characters.Player.stats.Intelegence < 70) ? "Your IQ falls far below the average, you have a hard time learning new things, and it takes quite a long time to understand new consepts. " :
-				(Characters.Player.stats.Intelegence < 85) ? "Your intelegence is lower than average, you can still learn new things, with enough time that is. " :
-				(Characters.Player.stats.Intelegence < 100) ? "You are about as intelegent as the average person, maybe only slightly below average. " :
-				(Characters.Player.stats.Intelegence < 115) ? "You have a higher intelegence than most, you'll catch on a little faster than the average person. " :
-				(Characters.Player.stats.Intelegence < 130) ? "You have a far higher intelegence than most indaviduals, you'll learn new things very quickly. " :
-				(Characters.Player.stats.Intelegence < 145) ? "Your intelegence risses greatly above average, you will learn things incredibly fast. " :
-				(Characters.Player.stats.Intelegence < 160) ? "You are considered a geniouse. Complex concepts are no obstical for you, and learning new things takes a blink of an eye. " :
-				"You are the smartest person in the world. You are beond a geniouse, some would say you are the smartest person who will ever live. ";
+				(Characters.Player.stats.FineMoter < 40) ? "Your fine moter skills are non-existant. You really can't manipulate small object at all, and can't exactly do anything that involves precision. " :
+				(Characters.Player.stats.FineMoter < 55) ? "Your fine moter skills are incredibly low, you have a hard time holding small things and manipulating them. " :
+				(Characters.Player.stats.FineMoter < 70) ? "Your fine moter skills are far less than average, it's dificult to hold onto things, and to manipulate them. " :
+				(Characters.Player.stats.FineMoter < 85) ? "You have lower fine moter skills than most, you have a harder time doing precission work than your peers. " :
+				(Characters.Player.stats.FineMoter < 115) ? "You have average fine moter skills. " :
+				(Characters.Player.stats.FineMoter < 130) ? "Your fine moter skills are higher than most. " :
+				(Characters.Player.stats.FineMoter < 145) ? "You have far higher fine moter skills than average. " :
+				(Characters.Player.stats.FineMoter < 160) ? "You have incredible fine moter skills. " :
+				"Your fine moter skills are legendary ";
 
 				temp +=
-				(Characters.Player.stats.Focus < 40) ? "Your ability to focus is non-existant. It isn't there... HEY! I'm talking over here! " :
-				(Characters.Player.stats.Focus < 55) ? "Your focus falls greatly below the average, you can't focus on anything for any reasonable length of time. " :
-				(Characters.Player.stats.Focus < 70) ? "Your ability to focus falls far below the average, you have a hard time staying on track, moving from one topic to another rapidly. You might even have a hard time finishing what you start. " :
-				(Characters.Player.stats.Focus < 85) ? "Your focus is lower than average, you have a hard time staying on track and it takes you longer to complete tasks due to how easily distracted you are. " :
-				(Characters.Player.stats.Focus < 100) ? "Your focus is about average, maybe slightly lower than most. " :
-				(Characters.Player.stats.Focus < 115) ? "Your focus is about average, maybe slightly higher than most. " :
-				(Characters.Player.stats.Focus < 130) ? "Your focus is higher than most, you'll be able to focus on tasks and see them through without issue. " :
-				(Characters.Player.stats.Focus < 145) ? "Your focus is far higher than most, you have laser like focus on whatever catches your attention, and it can be hard to pull you away from something that you are doing. " :
-				(Characters.Player.stats.Focus < 160) ? "Your focus rises greatly above everyone else, you have tunel vission when it comes to things that grab your attention, you'll see a single project all the wya throught to the end in a single sitting, and it is incredibly hard to pull you away from things you are focussed on. " :
-				"Your focus is legendary, you are so focused that you are nearly dead to the world, anything that grabs your attention will likely never leave your attention unless it is no longer a viable point of intrest, and even still, it will be hard to pull you away even then. ";
+				(Characters.Player.stats.Analysis < 40) ? "Your lack of analytical skills is legendary. " :
+				(Characters.Player.stats.Analysis < 55) ? "You have incredibly low analytical skills. " :
+				(Characters.Player.stats.Analysis < 70) ? "You have far lower analytical skills. " :
+				(Characters.Player.stats.Analysis < 85) ? "You have lower than average analytical skills. " :
+				(Characters.Player.stats.Analysis < 115) ? "You have average analytical skills. " :
+				(Characters.Player.stats.Analysis < 130) ? "You have higher than average analytical skills. " :
+				(Characters.Player.stats.Analysis < 145) ? "You have far higher analytical skills. " :
+				(Characters.Player.stats.Analysis < 160) ? "You have incredible analytical skills. " :
+				"Your analytical skills are legendary. ";
 
 				temp +=
-				(Characters.Player.stats.Wisdom < 40) ? "Your mind is a blank slate, you ahve no wisdom to speek of. it's a wonder you can even speek with how little is up there. " :
-				(Characters.Player.stats.Wisdom < 55) ? "Your wisdom falls greatly below average, you don't really know much of anything about the world around you. " :
-				(Characters.Player.stats.Wisdom < 70) ? "Your wisdome falls far below average, you know very little about the world. " :
-				(Characters.Player.stats.Wisdom < 85) ? "Your wisdom is lower than most, you know a little about the world. " :
-				(Characters.Player.stats.Wisdom < 100) ? "Your wisdom is about average, maybe slightly lower than most. " :
-				(Characters.Player.stats.Wisdom < 115) ? "Your wisdom is about average, maybe slightly higher than most. " :
-				(Characters.Player.stats.Wisdom < 130) ? "Your wisdome is higher than most, you know quite a bit about the world. " :
-				(Characters.Player.stats.Wisdom < 145) ? "Your wisdom rises far above average, you know minute details about all sourts of things. " :
-				(Characters.Player.stats.Wisdom < 160) ? "Your wisdom risses greatly above your peers, you know many things about many things, identifying things will come easy to you. " :
-				"Your wisdome is legendary, you know nearly everything about everything in the world, you'll be hard pressed to discover anything new. ";
+				(Characters.Player.stats.Reflex < 40) ? "Your lack of reflexes is legendary. " :
+				(Characters.Player.stats.Reflex < 55) ? "You have incredibly low reflexes. " :
+				(Characters.Player.stats.Reflex < 70) ? "You have far lower reflexes. " :
+				(Characters.Player.stats.Reflex < 85) ? "You have lower than average reflexes. " :
+				(Characters.Player.stats.Reflex < 115) ? "You have average reflexes. " :
+				(Characters.Player.stats.Reflex < 130) ? "You have higher than average reflexes. " :
+				(Characters.Player.stats.Reflex < 145) ? "You have far higher reflexes. " :
+				(Characters.Player.stats.Reflex < 160) ? "You have incredible reflexes. " :
+				"Your reflexes are legendary. ";
+
+				temp +=
+				(Characters.Player.stats.Intelegence < 40) ? "Your lack of intelegence is legendary. " :
+				(Characters.Player.stats.Intelegence < 55) ? "You have incredibly low intelegence. " :
+				(Characters.Player.stats.Intelegence < 70) ? "You have far lower intelegence. " :
+				(Characters.Player.stats.Intelegence < 85) ? "You have lower than average intelegence. " :
+				(Characters.Player.stats.Intelegence < 115) ? "You have average intelegence. " :
+				(Characters.Player.stats.Intelegence < 130) ? "You have higher than average intelegence. " :
+				(Characters.Player.stats.Intelegence < 145) ? "You have far higher intelegence. " :
+				(Characters.Player.stats.Intelegence < 160) ? "You have incredible intelegence. " :
+				"Your intelegence is legendary. ";
+
+				temp +=
+				(Characters.Player.stats.Knowledge < 40) ? "Your lack of knowledge is legendary. " :
+				(Characters.Player.stats.Knowledge < 55) ? "You have incredibly low knowledge. " :
+				(Characters.Player.stats.Knowledge < 70) ? "You have far lower knowledge. " :
+				(Characters.Player.stats.Knowledge < 85) ? "You have lower than average knowledge. " :
+				(Characters.Player.stats.Knowledge < 115) ? "You have average knowledge. " :
+				(Characters.Player.stats.Knowledge < 130) ? "You have higher than average knowledge. " :
+				(Characters.Player.stats.Knowledge < 145) ? "You have far higher knowledge. " :
+				(Characters.Player.stats.Knowledge < 160) ? "You have incredible knowledge. " :
+				"Your knowledge is legendary. ";
+
+				temp +=
+				(Characters.Player.stats.Focus < 40) ? "Your lack of focus is legendary. " :
+				(Characters.Player.stats.Focus < 55) ? "You have incredibly low focus. " :
+				(Characters.Player.stats.Focus < 70) ? "You have far lower focus. " :
+				(Characters.Player.stats.Focus < 85) ? "You have lower than average focus. " :
+				(Characters.Player.stats.Focus < 115) ? "You have average focus. " :
+				(Characters.Player.stats.Focus < 130) ? "You have higher than average focus. " :
+				(Characters.Player.stats.Focus < 145) ? "You have far higher focus. " :
+				(Characters.Player.stats.Focus < 160) ? "You have incredible focus. " :
+				"Your focus is legendary. ";
+
 
 				temp += "Are you happy with the way you've turned out?";
 

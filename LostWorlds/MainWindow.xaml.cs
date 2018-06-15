@@ -28,6 +28,11 @@ namespace LostWorlds
 	/// </summary>
 	/// 
 
+		/* Logic for the map:
+		 * + load in image
+		 * - on mouse down, move image the same ammount as the mouse moves
+		 */
+
 	public class Gender
 	{
 		public Stats mod = new Stats();
@@ -45,12 +50,15 @@ namespace LostWorlds
 		{
 			mod = new Stats()
 			{
-				Strength = 15,
-				Constitution = 0,
-				Dextarity = 0,
+				Strength = 7.5,
+				PainTolerance = -7.5,
+				Flexibility = -7.5,
+				FineMoter = 7.5,
+				Analysis = -7.5,
+				Reflex = 7.5,
 				Intelegence = 0,
-				Focus = -15,
-				Wisdom = 0,
+				Knowledge = 0,
+				Focus = 0,
 			}
 		};
 
@@ -58,12 +66,15 @@ namespace LostWorlds
 		{
 			mod = new Stats()
 			{
-				Strength = -15,
-				Constitution = 15,
-				Dextarity = 0,
+				Strength = -7.5,
+				PainTolerance = 7.5,
+				Flexibility = 7.5,
+				FineMoter = -7.5,
+				Analysis = 7.5,
+				Reflex = -7.5,
 				Intelegence = 0,
+				Knowledge = 0,
 				Focus = 0,
-				Wisdom = 0,
 			}
 		};
 	}
@@ -77,8 +88,7 @@ namespace LostWorlds
 		public attackText AT = new attackText();
 		public damageText DT = new damageText();
 		public string init = "";
-
-		public double knowlegeRateing = 100;
+		
 		public bool canLevel = false;
 		public Gender gender = new Gender();
 
@@ -104,11 +114,11 @@ namespace LostWorlds
 			{
 				return DT.unhurt;
 			}
-			else if(stats.Damage < stats.Constitution - 60)
+			else if(stats.Damage < stats.PainTolerance - 60)
 			{
 				return DT.healthy;
 			}
-			else if(stats.Damage < stats.Constitution)
+			else if(stats.Damage < stats.PainTolerance)
 			{
 				return DT.damaged;
 			}
@@ -120,30 +130,28 @@ namespace LostWorlds
 		
 		public string Attack(Entity target)
 		{
-			var wdamage = Math.Max(Utils.Gaussian(stats.Wisdom, 15) - target.knowlegeRateing, 0);
-			stats.Wisdom += (wdamage == 0 && canLevel) ? Utils.Gaussian(stats.Intelegence, 15) / 100 : 0;
-			// TODO: allow the target enemy's knowlegeLevel be mutated at this point in some way or another. 
-			// Goal is to have a "target.GetClass().knowlegeLevel -= [INSERT LOGIC HERE];" or some such thing.
-
-			var fdamage = Math.Max(Utils.Gaussian(stats.Focus, 15) - (target.stats.Dextarity - wdamage), 0);
-
-			var sdamage = Math.Max(Utils.Gaussian(stats.Strength, 15) - (target.stats.Constitution - wdamage), 0);
-			stats.Strength += Math.Max((Utils.Gaussian(100, 15) - stats.Strength) / 100, 0);
-
-			target.stats.Constitution += (target.canLevel) ? Math.Max((Utils.Gaussian(100, 15) - stats.Constitution) / 100, 0) : 0;
-
-			var tdamage = (fdamage > 0) ? fdamage : 0;
-			
-			target.stats.Damage += tdamage;
-			target.isAlive = Utils.Gaussian(target.stats.Damage, 15) < target.stats.Constitution;
-			/*
-			 * When attatcking, are you smart enough to find the week point?
-			 * are you focused enough to hit the target?
-			 * are you strong enough to hurt the target?
+			/* Combat Logic:
+			 * are you faster than the opponent? <- not handled here!
+			 * do you know the enemie's weakness? [knowledge] <- figure out a way to handle this
+			 *    if you do, then how accurately can you hit the weakness [fine moter]
+			 * can you analyse the movements of your opponent? [analysis]
+			 * can you hit your opponent? [fine motar]
+			 *    will they dodge? [flexibility]
+			 * how hard can you hit them? [strength]
+			 *    how well can they take the hit? [pain tolerance]    
 			 */
+			
+			var a = Utils.Gaussian(stats.Analysis, 15) - target.stats.Focus;
+			var fm = Utils.Gaussian(stats.FineMoter, 15) - target.stats.Flexibility;
+			var s = Utils.Gaussian(stats.Strength, 15) - target.stats.PainTolerance;
 
-			return (tdamage > 0) ? AT.attacking[Utils.rand.Next(AT.attacking.Count)] + AT.hit[Utils.rand.Next(AT.hit.Count)]
-				: AT.attacking[Utils.rand.Next(AT.attacking.Count)] + AT.miss[Utils.rand.Next(AT.miss.Count)];
+			var dmg = Math.Max(a + s + fm, 0);
+
+			target.stats.Damage += dmg;
+
+			target.isAlive = (Utils.Gaussian(target.stats.PainTolerance, 15) > target.stats.Damage);
+
+			return (dmg > 0) ? AT.hit[Utils.rand.Next(AT.hit.Count())] : AT.miss[Utils.rand.Next(AT.miss.Count())];
 		}		
 	}
 
@@ -251,6 +259,34 @@ namespace LostWorlds
 
 	}
 
+	public static class MapInfo
+	{
+		public static Utils.Vec origin = new Utils.Vec(500, 500);
+		public static Utils.Vec position = new Utils.Vec(0, 0);
+		public static Utils.Vec chunkPos = new Utils.Vec(0, 0);
+		public static bool doesDrag = false;
+
+		public static double PixelTime = Time.Hour / 200;
+
+		public static Utils.Vec OldMousPos;
+		internal static Utils.Vec OldPos;
+
+		public static void Update()
+		{
+			MainWindow.App.TopLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y - 1) + ".jpg", UriKind.Relative));
+			MainWindow.App.Top.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y - 1) + ".jpg", UriKind.Relative));
+			MainWindow.App.TopRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y - 1) + ".jpg", UriKind.Relative));
+			MainWindow.App.Left.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y) + ".jpg", UriKind.Relative));
+			MainWindow.App.Center.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y) + ".jpg", UriKind.Relative));
+			MainWindow.App.Right.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y) + ".jpg", UriKind.Relative));
+			MainWindow.App.BottomLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y + 1) + ".jpg", UriKind.Relative));
+			MainWindow.App.Bottom.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y + 1) + ".jpg", UriKind.Relative));
+			MainWindow.App.BottomRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y + 1) + ".jpg", UriKind.Relative));
+
+			Console.WriteLine("Position: " + position.X + ", " + position.Y);
+		}
+	}
+
 	public partial class MainWindow : Window
 	{
 		public MainWindow()
@@ -259,6 +295,7 @@ namespace LostWorlds
 			App = this;
 			Areas.Start.Load();
 			Update();
+			MapInfo.Update();
 		}
 
 		public static MainWindow App;
@@ -287,6 +324,7 @@ namespace LostWorlds
 			Time.Delta = 0;
 		}
 
+
 		private void button_Click(object sender, RoutedEventArgs e)
 		{
             //.Any() would do it without comparison <- how do you mean? not very familiar with C# to be frank, feel free to redo this code so I can see how to use that, seems a lot cleaner to me
@@ -305,6 +343,78 @@ namespace LostWorlds
 			Areas.Back.Clear();
 			Areas.Home.Load();
 			Update();
+		}
+
+		private Utils.Vec oldDeltaPos;
+
+		private void Map_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			oldDeltaPos = (Utils.Vec)e.GetPosition(Map);
+
+			MapInfo.OldMousPos = (Utils.Vec)e.GetPosition(Map) - new Utils.Vec(100, 100);
+			MapInfo.OldPos = MapInfo.position;
+			MapInfo.doesDrag = true;
+
+			Console.WriteLine("clicked!");
+		}
+
+		private void Map_MouseUp(object sender, MouseButtonEventArgs e)
+		{
+			MapInfo.doesDrag = false;
+		}
+
+		private void Map_MouseMove(object sender, MouseEventArgs e)
+		{
+			/* if you can drag, then drag
+			 * when draging, capture the relative position of the mouse to the map image
+			 * set the position of the map image to the position of the mouse 
+			 */
+			if(MapInfo.doesDrag)
+			{
+				MapInfo.position = MapInfo.OldPos + ((Utils.Vec)e.GetPosition(Map) - new Utils.Vec(100, 100) - MapInfo.OldMousPos);
+				
+				if(MapInfo.position.X < -200)
+				{
+					MapInfo.OldPos.X += 400;
+					MapInfo.chunkPos.X += 1;
+					MapInfo.Update();
+				}
+				if (MapInfo.position.X > 200)
+				{
+					MapInfo.OldPos.X -= 400;
+					MapInfo.chunkPos.X -= 1;
+					MapInfo.Update();
+				}
+
+				if (MapInfo.position.Y < -200)
+				{
+					MapInfo.OldPos.Y += 400;
+					MapInfo.chunkPos.Y += 1;
+					MapInfo.Update();
+				}
+				if (MapInfo.position.Y > 200)
+				{
+					MapInfo.OldPos.Y -= 400;
+					MapInfo.chunkPos.Y -= 1;
+					MapInfo.Update();
+				}
+
+				Canvas.SetLeft(Chunks, MapInfo.position.X - MapInfo.origin.X);
+				Canvas.SetTop(Chunks, MapInfo.position.Y - MapInfo.origin.Y);
+
+				Utils.Vec deltaPos = (Utils.Vec)e.GetPosition(Map) - oldDeltaPos;
+
+				Time.Delta = (uint)(Math.Sqrt(deltaPos | deltaPos) * MapInfo.PixelTime);
+
+				Update();
+
+				oldDeltaPos = (Utils.Vec)e.GetPosition(Map);
+			}
+		}
+
+		private void Map_MouseLeave(object sender, MouseEventArgs e)
+		{
+			MapInfo.doesDrag = false;
 		}
 	}
 }

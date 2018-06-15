@@ -19,19 +19,14 @@ namespace LostWorlds
 		public void StatInit(Entity e)
 		{
 			e.stats.Strength = Utils.Gaussian(BaseStats.Strength, 15) + e.gender.mod.Strength;
-			e.stats.Constitution = Utils.Gaussian(BaseStats.Constitution, 15) + e.gender.mod.Constitution;
-			e.stats.Dextarity = Utils.Gaussian(BaseStats.Dextarity, 15) + e.gender.mod.Dextarity;
+			e.stats.PainTolerance = Utils.Gaussian(BaseStats.PainTolerance, 15) + e.gender.mod.PainTolerance;
+			e.stats.Flexibility = Utils.Gaussian(BaseStats.Flexibility, 15) + e.gender.mod.Flexibility;
 			e.stats.Intelegence = Utils.Gaussian(BaseStats.Intelegence, 15) + e.gender.mod.Intelegence;
-			e.stats.Wisdom = Utils.Gaussian(BaseStats.Wisdom, 15) + e.gender.mod.Wisdom;
+			e.stats.Knowledge = Utils.Gaussian(BaseStats.Knowledge, 15) + e.gender.mod.Knowledge;
 			e.stats.Focus = Utils.Gaussian(BaseStats.Focus, 15) + e.gender.mod.Focus;
-
-
-			Console.WriteLine("Strength: " + e.stats.Strength);
-			Console.WriteLine("Constitution: " + e.stats.Constitution);
-			Console.WriteLine("Dextarity: " + e.stats.Dextarity);
-			Console.WriteLine("Intelegence: " + e.stats.Intelegence);
-			Console.WriteLine("Wisdom: " + e.stats.Wisdom);
-			Console.WriteLine("Focus: " + e.stats.Focus);
+			e.stats.FineMoter = Utils.Gaussian(BaseStats.FineMoter, 15) + e.gender.mod.FineMoter;
+			e.stats.Analysis = Utils.Gaussian(BaseStats.Analysis, 15) + e.gender.mod.Analysis;
+			e.stats.Reflex = Utils.Gaussian(BaseStats.Reflex, 15) + e.gender.mod.Reflex;
 		}
 	}
 
@@ -43,11 +38,14 @@ namespace LostWorlds
 			BaseStats = new Stats()
 			{
 				Strength = 110,
-				Constitution = 110,
-				Dextarity = 90,
-				Intelegence = 95,
-				Wisdom = 95,
-				Focus = 100
+				PainTolerance = 100,
+				Flexibility = 110,
+				Intelegence = 90,
+				Knowledge = 90,
+				Focus = 100,
+				Reflex = 100,
+				Analysis = 90,
+				FineMoter = 110,
 			}
 		};
 
@@ -57,11 +55,14 @@ namespace LostWorlds
 			BaseStats = new Stats()
 			{
 				Strength = 100,
-				Constitution = 100,
-				Dextarity = 100,
+				PainTolerance = 100,
+				Flexibility = 100,
 				Intelegence = 100,
-				Wisdom = 100,
+				Knowledge = 100,
 				Focus = 100,
+				Reflex = 100,
+				Analysis = 100,
+				FineMoter = 100,
 			}
 		};
 	}

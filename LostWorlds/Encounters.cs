@@ -19,8 +19,6 @@ namespace LostWorlds
 		public Enemy enemy = new Enemy();
 		public string Text;
 		public Action Setup = null;
-		public Action Attack = null;
-		public Action Run = null;
 		public Area Location = new Area();
 
 		private void LoadActions()
@@ -120,10 +118,5 @@ namespace LostWorlds
 				enemy = new Enemies.test();
 			}
 		}
-
-		public static Encounter Test = new Encounter()
-		{
-			enemy = new Enemies.test(),
-		};
 	}
 }

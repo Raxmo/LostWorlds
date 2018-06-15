@@ -15,11 +15,24 @@ namespace LostWorlds
 	{
 		
 	}
-	
+	/* Stat block for ease:
+	 
+	   Strength = 100,
+	   PainTolerance = 100,
+	   Flexibility = 100,
+	   FineMoter = 100,
+	   Analysis = 100,
+	   Reflex = 100,
+	   Intelegence = 100,
+	   Knowledge = 100,
+	   Focus = 100, 
+	 */
+
 	public static class Enemies
 	{
 		public class test : Enemy //inheriting from the Enemy class so it can be used as a templait in encounters, rather than mutating them during run-time.
 		{
+			
 			public test()
 			{
 				name = "tester thing";
@@ -62,17 +75,17 @@ namespace LostWorlds
 					critical = "The thing is berally holding itself together, each part of it's body taking seconds to catch up to where it is supposed to be, and never syncronously. " 
 				};
 
-				knowlegeRateing = 85;
-
 				stats = new Stats()
 				{
-					Strength = 100,
-					Dextarity = 100,
-					Constitution = 100,
-					Intelegence = 100,
-					Wisdom = 100,
-					Focus = 100,
-					Damage = 0
+					Strength = 85,
+					PainTolerance = 85,
+					Flexibility = 85,
+					FineMoter = 85,
+					Analysis = 85,
+					Reflex = 85,
+					Intelegence = 85,
+					Knowledge = 85,
+					Focus = 85,
 				};
 			}
 		}

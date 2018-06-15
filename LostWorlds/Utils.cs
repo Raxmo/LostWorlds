@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LostWorlds
 {
@@ -87,6 +88,11 @@ namespace LostWorlds
 			{
 				this.X = x;
 				this.Y = y;
+			}
+
+			public static explicit operator Vec(Point p)
+			{
+				return new Vec(p.X, p.Y);
 			}
 
 			public static Vec operator ~(Vec a) //normalize
