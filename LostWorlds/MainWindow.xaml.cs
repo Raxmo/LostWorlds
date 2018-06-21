@@ -18,7 +18,6 @@ using System.Dynamic;
 /*
  * TODO:
  * This is one mess of code, but everything is fine the way it is for now. might re-work it a little later.
- * Might end up adding in a physical map, will think about how to impliment it and decide on that later.
  */
 
 namespace LostWorlds
@@ -27,11 +26,6 @@ namespace LostWorlds
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	/// 
-
-		/* Logic for the map:
-		 * + load in image
-		 * - on mouse down, move image the same ammount as the mouse moves
-		 */
 
 	public class Gender
 	{
@@ -261,27 +255,27 @@ namespace LostWorlds
 
 	public static class MapInfo
 	{
-		public static Utils.Vec origin = new Utils.Vec(500, 500);
+		public static Utils.Vec origin = new Utils.Vec(284, 284);
 		public static Utils.Vec position = new Utils.Vec(0, 0);
-		public static Utils.Vec chunkPos = new Utils.Vec(0, 0);
+		public static Utils.Vec chunkPos = new Utils.Vec(10, 10);
 		public static bool doesDrag = false;
 
-		public static double PixelTime = Time.Hour / 200;
+		public static double PixelTime = Time.Hour / 500; // <- this turns out to be about 100 px/km
 
 		public static Utils.Vec OldMousPos;
 		internal static Utils.Vec OldPos;
 
 		public static void Update()
 		{
-			MainWindow.App.TopLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y - 1) + ".jpg", UriKind.Relative));
-			MainWindow.App.Top.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y - 1) + ".jpg", UriKind.Relative));
-			MainWindow.App.TopRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y - 1) + ".jpg", UriKind.Relative));
-			MainWindow.App.Left.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y) + ".jpg", UriKind.Relative));
-			MainWindow.App.Center.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y) + ".jpg", UriKind.Relative));
-			MainWindow.App.Right.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y) + ".jpg", UriKind.Relative));
-			MainWindow.App.BottomLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y + 1) + ".jpg", UriKind.Relative));
-			MainWindow.App.Bottom.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y + 1) + ".jpg", UriKind.Relative));
-			MainWindow.App.BottomRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y + 1) + ".jpg", UriKind.Relative));
+			MainWindow.App.TopLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y - 1) + ".bmp", UriKind.Relative));
+			MainWindow.App.Top.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y - 1) + ".bmp", UriKind.Relative));
+			MainWindow.App.TopRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y - 1) + ".bmp", UriKind.Relative));
+			MainWindow.App.Left.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y) + ".bmp", UriKind.Relative));
+			MainWindow.App.Center.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y) + ".bmp", UriKind.Relative));
+			MainWindow.App.Right.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y) + ".bmp", UriKind.Relative));
+			MainWindow.App.BottomLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y + 1) + ".bmp", UriKind.Relative));
+			MainWindow.App.Bottom.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y + 1) + ".bmp", UriKind.Relative));
+			MainWindow.App.BottomRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y + 1) + ".bmp", UriKind.Relative));
 
 			Console.WriteLine("Position: " + position.X + ", " + position.Y);
 		}
@@ -373,28 +367,28 @@ namespace LostWorlds
 			{
 				MapInfo.position = MapInfo.OldPos + ((Utils.Vec)e.GetPosition(Map) - new Utils.Vec(100, 100) - MapInfo.OldMousPos);
 				
-				if(MapInfo.position.X < -200)
+				if(MapInfo.position.X < -128)
 				{
-					MapInfo.OldPos.X += 400;
+					MapInfo.OldPos.X += 256;
 					MapInfo.chunkPos.X += 1;
 					MapInfo.Update();
 				}
-				if (MapInfo.position.X > 200)
+				if (MapInfo.position.X > 128)
 				{
-					MapInfo.OldPos.X -= 400;
+					MapInfo.OldPos.X -= 256;
 					MapInfo.chunkPos.X -= 1;
 					MapInfo.Update();
 				}
 
-				if (MapInfo.position.Y < -200)
+				if (MapInfo.position.Y < -128)
 				{
-					MapInfo.OldPos.Y += 400;
+					MapInfo.OldPos.Y += 256;
 					MapInfo.chunkPos.Y += 1;
 					MapInfo.Update();
 				}
-				if (MapInfo.position.Y > 200)
+				if (MapInfo.position.Y > 128)
 				{
-					MapInfo.OldPos.Y -= 400;
+					MapInfo.OldPos.Y -= 256;
 					MapInfo.chunkPos.Y -= 1;
 					MapInfo.Update();
 				}

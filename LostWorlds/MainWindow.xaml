@@ -14,7 +14,11 @@
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
-        <Canvas x:Name="Tracker" Margin="0,0,10,10" Height="200" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="200" Background="Black"/>
+        <Canvas x:Name="Tracker" Margin="0,0,10,10" Height="200" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="200" Background="Black">
+            <Canvas.Clip>
+                <EllipseGeometry Center="100, 100" RadiusX="100" RadiusY="100"/>
+            </Canvas.Clip>
+        </Canvas>
         <Label x:Name="Years" Content="Year:" HorizontalAlignment="Right" Margin="0,10,115,0" VerticalAlignment="Top" Background="Black" Foreground="White" Width="95"/>
         <Label x:Name="Days" Content="Day:" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Background="Black" Foreground="White" Width="95"/>
         <Label x:Name="Label2" Content="Player" HorizontalAlignment="Right" Margin="0,41,115,0" Background="Black" Foreground="White" Width="95" Height="26" VerticalAlignment="Top"/>
@@ -41,18 +45,18 @@
         <Button x:Name="Home" Content="Go Home" HorizontalAlignment="Right" Margin="0,134,10,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="White" BorderBrush="White" Click="home_Click"/>
         <Canvas x:Name="Map" HorizontalAlignment="Right" Margin="0,0,10,220" Width="200" Height="200" VerticalAlignment="Bottom" MouseMove="Map_MouseMove" MouseDown="Map_MouseDown" MouseUp="Map_MouseUp" Background="Black" MouseLeave="Map_MouseLeave">
             <Canvas.Clip>
-                <RectangleGeometry Rect="0, 0, 200, 200"/>
+                <EllipseGeometry Center="100,100" RadiusX="100" RadiusY="100"/>
             </Canvas.Clip>
-            <Canvas Name="Chunks" Width="1200" Height="1200" Canvas.Left="-500" Canvas.Top="-500">
-                <Image Name="Center" Height="400" Canvas.Left="400" Canvas.Top="400" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="Left" Height="400" Canvas.Left="0" Canvas.Top="400" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="Right" Height="400" Canvas.Left="800" Canvas.Top="400" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="Top" Height="400" Canvas.Left="400" Canvas.Top="0" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="Bottom" Height="400" Canvas.Left="400" Canvas.Top="800" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="TopLeft" Height="400" Canvas.Left="0" Canvas.Top="0" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="TopRight" Height="400" Canvas.Left="800" Canvas.Top="0" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="BottomLeft" Height="400" Canvas.Left="0" Canvas.Top="800" Width="400" Source="Map/chunk,0,0.jpg"/>
-                <Image Name="BottomRight" Height="400" Canvas.Left="800" Canvas.Top="800" Width="400" Source="Map/chunk,0,0.jpg"/>
+            <Canvas Name="Chunks" Width="768" Height="768" Canvas.Left="-284" Canvas.Top="-284">
+                <Image Name="Center" Height="256" Canvas.Left="256" Canvas.Top="256" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="Left" Height="256" Canvas.Left="0" Canvas.Top="256" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="Right" Height="256" Canvas.Left="512" Canvas.Top="256" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="Top" Height="256" Canvas.Left="256" Canvas.Top="0" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="Bottom" Height="256" Canvas.Left="256" Canvas.Top="512" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="TopLeft" Height="256" Canvas.Left="0" Canvas.Top="0" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="TopRight" Height="256" Canvas.Left="512" Canvas.Top="0" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="BottomLeft" Height="256" Canvas.Left="0" Canvas.Top="512" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="BottomRight" Height="256" Canvas.Left="512" Canvas.Top="512" Width="256" Source="Map/chunk,10,10.bmp"/>
             </Canvas>
         </Canvas>
 
