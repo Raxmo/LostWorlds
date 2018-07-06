@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
 using System.Dynamic;
+using Utils;
+using MapFile;
 
 /*
  * TODO:
@@ -177,7 +179,7 @@ namespace LostWorlds
 		{
 			Width = 200,
 			Height = 200,
-			Stroke = Brushes.White,
+			Stroke = System.Windows.Media.Brushes.White,
 			StrokeThickness = 3
 		};
 
@@ -210,15 +212,15 @@ namespace LostWorlds
             //ternary would simplify it to Circle.Stroke = (Pos | Pos) > Math.Pow(100 + Radius, 2) ? Brushes.Transparent : Brushes.White;
             if ((Pos | Pos) > Math.Pow(100 + Radius, 2)) //only display the sun if it is actually above the horizon
 			{
-				Circle.Stroke = Brushes.Transparent;
-				Circle.Fill = Brushes.Transparent;
-				Horizon.Fill = new SolidColorBrush(Color.FromRgb(20, 20, 30));
+				Circle.Stroke = System.Windows.Media.Brushes.Transparent;
+				Circle.Fill = System.Windows.Media.Brushes.Transparent;
+				Horizon.Fill = new SolidColorBrush(System.Windows.Media.Color.FromRgb(20, 20, 30));
 			}
 			else
 			{
-				Circle.Stroke = Brushes.White;
-				Circle.Fill = Brushes.White;
-				Horizon.Fill = new SolidColorBrush(Color.FromRgb(40, 40, 100));
+				Circle.Stroke = System.Windows.Media.Brushes.White;
+				Circle.Fill = System.Windows.Media.Brushes.White;
+				Horizon.Fill = new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 100));
 			}
 			Circle.StrokeThickness = 3;
 			Circle.SetValue(Canvas.LeftProperty, (Pos + Origin).X - Radius);
@@ -253,32 +255,206 @@ namespace LostWorlds
 
 	}
 
+	public struct ChunkInfo
+	{
+
+		public static System.Drawing.Color[] biomeColor = new System.Drawing.Color[] 
+												{System.Drawing.Color.Firebrick,
+												 System.Drawing.Color.Gray,
+												 System.Drawing.Color.Olive,
+												 System.Drawing.Color.DodgerBlue,
+												 System.Drawing.Color.ForestGreen,
+												 System.Drawing.Color.AntiqueWhite,
+												 System.Drawing.Color.Yellow,
+												 System.Drawing.Color.GreenYellow};
+
+		public Vec center;
+		public byte[,] biomes;
+
+		public BitmapSource Bmp()
+		{
+			BitmapSource output;
+			using (Bitmap gen = new Bitmap(256, 256))
+			{
+				for (int x = 0; x < gen.Width; x++)
+				{
+					for (int y = 0; y < gen.Height; y++)
+					{
+						gen.SetPixel(x, y, biomeColor[biomes[x, y]]);
+					}
+				}
+
+				output =
+				System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+				gen.GetHbitmap(),
+				IntPtr.Zero,
+				Int32Rect.Empty,
+				BitmapSizeOptions.FromWidthAndHeight(256, 256));
+			}
+				return output;
+		}
+
+		public ChunkInfo(GlobalData g, uint gx, uint gy)
+		{
+			center = g.GetChunk(gx, gy).BiomeCenter;
+			var biomec = g.GetChunk(gx, gy).BiomeID;
+
+			var neighbors = new Vec[3, 3];
+			var nbiomes = new byte[3, 3];
+
+			for (int ny = -1; ny < 1; ny++)
+			{
+				for (int nx = -1; nx < 1; nx++)
+				{
+					if ((nx + gx) >= 0 && (nx + gx) < g.Width && (ny + gy) >= 0 && (ny + gy) < g.Height)
+					{
+						var point = g.GetChunk((uint)(gx + nx), (uint)(gy + ny)).BiomeCenter;
+						point = point.X * (Consts.Circ ^ new Vec(0, point.Y / 64));
+						var offset = new Vec(256 * nx, 256 * ny);
+						point += offset;
+						point += new Vec(128, 128);
+
+						neighbors[nx + 1, ny + 1] = point;
+						nbiomes[nx + 1, ny + 1] = g.GetChunk((uint)(gx + nx), (uint)(gy + ny)).BiomeID;
+					}
+				}
+			}
+
+			biomes = new byte[256, 256];
+
+			var booltotal = false;
+			byte lastChecked = nbiomes[1, 1];
+
+			foreach (byte b in nbiomes)
+			{
+				booltotal = lastChecked == b;
+				lastChecked = b;
+
+				if (!booltotal) { break; }
+			}
+
+			var doflood = true;
+
+			if (booltotal || doflood)
+			{
+				for (int tx = 0; tx < biomes.GetLength(0); tx++)
+				{
+					for (int ty = 0; ty < biomes.GetLength(1); ty++)
+					{
+						biomes[tx, ty] = nbiomes[1, 1];
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					for (int j = 0; j < 2; j++)
+					{
+						int x1 = (i == 0) ? 0 : (int)center.X;
+						int x2 = (i == 0) ? (int)center.X : biomes.GetLength(0);
+
+						int y1 = (j == 0) ? 0 : (int)center.Y;
+						int y2 = (j == 0) ? (int)center.Y : biomes.GetLength(1);
+
+						var v1 = neighbors[i, j];
+						var v2 = neighbors[i, j + 1];
+						var v3 = neighbors[i + 1, j];
+						var v4 = neighbors[i + 1, j + 1];
+
+						var b1 = nbiomes[i, j];
+						var b2 = nbiomes[i, j + 1];
+						var b3 = nbiomes[i + 1, j];
+						var b4 = nbiomes[i + 1, j + 1];
+
+						var checking = new Vec[4] { v1, v2, v3, v4 };
+						var checkbiomes = new byte[4] { b1, b2, b3, b4 };
+
+						for (int cx = x1; cx < x2; cx++)
+						{
+							for (int cy = y1; cy < y2; cy++)
+							{
+								if (b1 == b2 && b2 == b3 && b3 == b4)
+								{
+									biomes[cx, cy] = b1;
+								}
+								else
+								{
+									var sample = new Vec(cx, cy);
+
+									var curDist = int.MaxValue;
+
+									byte foundBiome = 0;
+
+									for (int k = 0; k < 4; k++)
+									{
+										var part = sample - checking[k];
+										var dist = part | part;
+
+										if (dist < curDist)
+										{
+											curDist = (int)dist;
+											foundBiome = checkbiomes[k];
+										}
+									}
+
+									biomes[cx, cy] = foundBiome;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public static class MapInfo
 	{
-		public static Utils.Vec origin = new Utils.Vec(284, 284);
-		public static Utils.Vec position = new Utils.Vec(0, 0);
-		public static Utils.Vec chunkPos = new Utils.Vec(10, 10);
-		public static bool doesDrag = false;
+		/* Steps for the map stuffs
+		 * 
+		 * - map current location to world map
+		 * - generate the 4 relavent chunks depending on current quadrent of current chunk
+		 * - generate all 9 blocks from current chunks location
+		 *   - MUST have some texture to ground the player with their suroundings
+		 *   - Likely some sourt of anti-aliassing situation, or bluring system with a random gradiant, or a random gradiant at first
+		 */
+		 
+		public static Vec chunkPos = new Vec(5, 3);
+		public static Vec position = new Vec();
+		public static Vec OldPos = new Vec();
+		public static Vec OldMousPos = new Vec();
+		public static Vec origin = new Vec(128, 128);
+		public static double PixelTime = Time.Hour / 500;
+		public static bool DoesDrag = false;
 
-		public static double PixelTime = Time.Hour / 500; // <- this turns out to be about 100 px/km
-
-		public static Utils.Vec OldMousPos;
-		internal static Utils.Vec OldPos;
-
+		public static GlobalData GlobalMap = new GlobalData("../../Map/world.gbd");
+				
 		public static void Update()
 		{
-			MainWindow.App.TopLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y - 1) + ".bmp", UriKind.Relative));
-			MainWindow.App.Top.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y - 1) + ".bmp", UriKind.Relative));
-			MainWindow.App.TopRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y - 1) + ".bmp", UriKind.Relative));
-			MainWindow.App.Left.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y) + ".bmp", UriKind.Relative));
-			MainWindow.App.Center.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y) + ".bmp", UriKind.Relative));
-			MainWindow.App.Right.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y) + ".bmp", UriKind.Relative));
-			MainWindow.App.BottomLeft.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X - 1) + "," + (chunkPos.Y + 1) + ".bmp", UriKind.Relative));
-			MainWindow.App.Bottom.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X) + "," + (chunkPos.Y + 1) + ".bmp", UriKind.Relative));
-			MainWindow.App.BottomRight.Source = new BitmapImage(new Uri(@"Map/chunk," + (chunkPos.X + 1) + "," + (chunkPos.Y + 1) + ".bmp", UriKind.Relative));
+			var chunks = new ChunkInfo[3, 3];
+			for(int i = -1; i <= 1; i++)
+			{
+				for (int j = -1; j <= 1; j++)
+				{
+					chunks[i + 1, j + 1] = new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j));
+				}
+			}
 
-			Console.WriteLine("Position: " + position.X + ", " + position.Y);
+			MainWindow.App.TopLeft.Source = chunks[0, 0].Bmp();
+			MainWindow.App.Top.Source = chunks[1, 0].Bmp();
+			MainWindow.App.TopRight.Source = chunks[2, 0].Bmp();
+
+			MainWindow.App.Left.Source = chunks[0, 1].Bmp();
+			MainWindow.App.Center.Source = chunks[1, 1].Bmp();
+			MainWindow.App.Right.Source = chunks[2, 1].Bmp();
+
+			MainWindow.App.BottomLeft.Source = chunks[0, 2].Bmp();
+			MainWindow.App.Bottom.Source = chunks[1, 2].Bmp();
+			MainWindow.App.BottomRight.Source = chunks[2, 2].Bmp();
+
+			Console.WriteLine(chunkPos.X + ", " + chunkPos.Y);
 		}
+		 
 	}
 
 	public partial class MainWindow : Window
@@ -345,16 +521,16 @@ namespace LostWorlds
 		{
 			oldDeltaPos = (Utils.Vec)e.GetPosition(Map);
 
-			MapInfo.OldMousPos = (Utils.Vec)e.GetPosition(Map) - new Utils.Vec(100, 100);
+			MapInfo.OldMousPos = (Vec)e.GetPosition(Map) - new Vec(100, 100);
 			MapInfo.OldPos = MapInfo.position;
-			MapInfo.doesDrag = true;
+			MapInfo.DoesDrag = true;
 
 			Console.WriteLine("clicked!");
 		}
 
 		private void Map_MouseUp(object sender, MouseButtonEventArgs e)
 		{
-			MapInfo.doesDrag = false;
+			MapInfo.DoesDrag = false;
 		}
 
 		private void Map_MouseMove(object sender, MouseEventArgs e)
@@ -363,9 +539,9 @@ namespace LostWorlds
 			 * when draging, capture the relative position of the mouse to the map image
 			 * set the position of the map image to the position of the mouse 
 			 */
-			if(MapInfo.doesDrag)
+			if(MapInfo.DoesDrag)
 			{
-				MapInfo.position = MapInfo.OldPos + ((Utils.Vec)e.GetPosition(Map) - new Utils.Vec(100, 100) - MapInfo.OldMousPos);
+				MapInfo.position = MapInfo.OldPos + ((Vec)e.GetPosition(Map) - new Vec(100, 100) - MapInfo.OldMousPos);
 				
 				if(MapInfo.position.X < -128)
 				{
@@ -408,7 +584,7 @@ namespace LostWorlds
 
 		private void Map_MouseLeave(object sender, MouseEventArgs e)
 		{
-			MapInfo.doesDrag = false;
+			MapInfo.DoesDrag = false;
 		}
 	}
 }

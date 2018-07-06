@@ -48,15 +48,15 @@
                 <EllipseGeometry Center="100,100" RadiusX="100" RadiusY="100"/>
             </Canvas.Clip>
             <Canvas Name="Chunks" Width="768" Height="768" Canvas.Left="-284" Canvas.Top="-284">
-                <Image Name="Center" Height="256" Canvas.Left="256" Canvas.Top="256" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="Left" Height="256" Canvas.Left="0" Canvas.Top="256" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="Right" Height="256" Canvas.Left="512" Canvas.Top="256" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="Top" Height="256" Canvas.Left="256" Canvas.Top="0" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="Bottom" Height="256" Canvas.Left="256" Canvas.Top="512" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="TopLeft" Height="256" Canvas.Left="0" Canvas.Top="0" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="TopRight" Height="256" Canvas.Left="512" Canvas.Top="0" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="BottomLeft" Height="256" Canvas.Left="0" Canvas.Top="512" Width="256" Source="Map/chunk,10,10.bmp"/>
-                <Image Name="BottomRight" Height="256" Canvas.Left="512" Canvas.Top="512" Width="256" Source="Map/chunk,10,10.bmp"/>
+                <Image Name="Center" Height="256" Canvas.Left="256" Canvas.Top="256" Width="256"/>
+                <Image Name="Left" Height="256" Canvas.Left="0" Canvas.Top="256" Width="256"/>
+                <Image Name="Right" Height="256" Canvas.Left="512" Canvas.Top="256" Width="256"/>
+                <Image Name="Top" Height="256" Canvas.Left="256" Canvas.Top="0" Width="256"/>
+                <Image Name="Bottom" Height="256" Canvas.Left="256" Canvas.Top="512" Width="256"/>
+                <Image Name="TopLeft" Height="256" Canvas.Left="0" Canvas.Top="0" Width="256"/>
+                <Image Name="TopRight" Height="256" Canvas.Left="512" Canvas.Top="0" Width="256"/>
+                <Image Name="BottomLeft" Height="256" Canvas.Left="0" Canvas.Top="512" Width="256"/>
+                <Image Name="BottomRight" Height="256" Canvas.Left="512" Canvas.Top="512" Width="256"/>
             </Canvas>
         </Canvas>
 
