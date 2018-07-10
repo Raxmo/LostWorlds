@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
 using System.Dynamic;
+using System.Threading;
 using Utils;
 using MapFile;
 
@@ -426,31 +427,73 @@ namespace LostWorlds
 		public static Vec origin = new Vec(128, 128);
 		public static double PixelTime = Time.Hour / 500;
 		public static bool DoesDrag = false;
-
+        static BitmapSource[,] Bitmaps = new BitmapSource[3,3];
+      
 		public static GlobalData GlobalMap = new GlobalData("../../Map/world.gbd");
-				
+
+        /*offloads chunk generation and bitmapsource making into worker threads
+         * makes new threadpool threads and calls the callback for them
+         */
+	    static void ThreadedChunkInfo()
+	    {
+            //countdown event to lock this thread until all the worker threads are done
+	        using (var countdown = new CountdownEvent(9))
+	        {
+	            for (var i = -1; i <= 1; i++) {
+	                for (var j = -1; j <= 1; j++) {
+	                    //queues a chunk to be processed
+	                    ThreadPool.QueueUserWorkItem(ThreadedChunkInfoCallback, new object[] { i,j,countdown});
+	                }
+	            }
+                
+                //wait for countdown event to reach 0
+	            countdown.Wait();
+	        }
+        }
+
+        /*callback for threading of chunk processing
+         * unwraps thread context object then processes the chunk and freezes the BitmapSource
+         */
+	    static void ThreadedChunkInfoCallback(object threadContext)
+	    {
+	        var context = threadContext as object[];
+	        var i = Convert.ToInt32(context[0]);
+	        var j = Convert.ToInt32(context[1]);
+	        var countdown = (CountdownEvent) context[2];
+
+	        Bitmaps[i + 1, j + 1] = (new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j))).Bmp();
+            //freezes the BitmapSource to make it accessible from other threads
+	        Bitmaps[i + 1, j + 1].Freeze();
+
+            //signals that this thread is done and ready to be synchronised with the main thread
+            countdown.Signal();
+	    }
 		public static void Update()
 		{
-			var chunks = new ChunkInfo[3, 3];
+			/*var chunks = new ChunkInfo[3, 3];
 			for(int i = -1; i <= 1; i++)
 			{
 				for (int j = -1; j <= 1; j++)
 				{
 					chunks[i + 1, j + 1] = new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j));
 				}
-			}
+			}*/
 
-			MainWindow.App.TopLeft.Source = chunks[0, 0].Bmp();
-			MainWindow.App.Top.Source = chunks[1, 0].Bmp();
-			MainWindow.App.TopRight.Source = chunks[2, 0].Bmp();
+            //prepares BitmapSources to be used
+            ThreadedChunkInfo();
+            
+			MainWindow.App.TopLeft.Source = Bitmaps[0, 0];
+			MainWindow.App.Top.Source = Bitmaps[1, 0];
+			MainWindow.App.TopRight.Source = Bitmaps[2, 0];
 
-			MainWindow.App.Left.Source = chunks[0, 1].Bmp();
-			MainWindow.App.Center.Source = chunks[1, 1].Bmp();
-			MainWindow.App.Right.Source = chunks[2, 1].Bmp();
+			MainWindow.App.Left.Source = Bitmaps[0, 1];
+			MainWindow.App.Center.Source = Bitmaps[1, 1];
+			MainWindow.App.Right.Source = Bitmaps[2, 1];
 
-			MainWindow.App.BottomLeft.Source = chunks[0, 2].Bmp();
-			MainWindow.App.Bottom.Source = chunks[1, 2].Bmp();
-			MainWindow.App.BottomRight.Source = chunks[2, 2].Bmp();
+			MainWindow.App.BottomLeft.Source = Bitmaps[0, 2];
+			MainWindow.App.Bottom.Source = Bitmaps[1, 2];
+			MainWindow.App.BottomRight.Source = Bitmaps[2, 2];
+
 
 			Console.WriteLine(chunkPos.X + ", " + chunkPos.Y);
 		}

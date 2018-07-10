@@ -136,6 +136,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Utils.dll" />
     <Resource Include="Map\chunk,0,0.bmp" />
     <Resource Include="Map\chunk,0,1.bmp" />
     <Resource Include="Map\chunk,0,10.bmp" />
@@ -257,6 +258,7 @@
     <Resource Include="Map\chunk,9,7.bmp" />
     <Resource Include="Map\chunk,9,8.bmp" />
     <Resource Include="Map\chunk,9,9.bmp" />
+    <Content Include="MapFile.dll" />
     <Content Include="Map\Map Generator.exe" />
     <Resource Include="Map\world.bmp" />
   </ItemGroup>
