@@ -274,13 +274,14 @@ namespace LostWorlds
 		public BitmapSource Bmp()
 		{
 			BitmapSource output;
+			var rng1 = new Random(319);
 			using (Bitmap gen = new Bitmap(256, 256))
 			{
 				for (int x = 0; x < gen.Width; x++)
 				{
 					for (int y = 0; y < gen.Height; y++)
 					{
-						gen.SetPixel(255 - x, 255 - y, biomeColor[biomes[x, y]]);
+						gen.SetPixel(x, y, System.Drawing.Color.FromArgb(rng1.Next(64)+rng1.Next(64)+rng1.Next(64)+rng1.Next(64), biomeColor[biomes[x, y]]));
 					}
 				}
 
@@ -306,12 +307,12 @@ namespace LostWorlds
 			{
 				for (int j = 0; j < 3; j++)
 				{
-					var tcent = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeCenter; // grab the raw data form the global source
-					tcent = tcent * (Consts.Circ ^ (new Vec(0, tcent.Y) / 64));					// use that raw data to create a random point based off of polar coordinates
-					tcent += new Vec(i - 1, j - 1) * 256;										// offset the point to be centered in the center of the chunk that it belongs to
+					var tcent = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeCenter;							// grab the raw data form the global source
+					tcent = new Vec(128, 128) + (tcent * (Consts.Circ ^ (new Vec(0, tcent.Y) / 64)));					// use that raw data to create a random point based off of polar coordinates
+					tcent += new Vec(i - 1, j - 1) * 256;																// offset the point to be centered in the center of the chunk that it belongs to
 
-					ncenters[i, j] = tcent;														// populate the neighbor centers with this new generated point
-					nbiomes[i, j] = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeID; // populate the neighbor biomes with the proper biome ID
+					ncenters[i, j] = tcent;																				// populate the neighbor centers with this new generated point
+					nbiomes[i, j] = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeID;							// populate the neighbor biomes with the proper biome ID
 				}
 			}
 
@@ -323,11 +324,15 @@ namespace LostWorlds
 					double dist = int.MaxValue;
 					byte biome = nbiomes[1,1];
 
+					var p = new Vec(x, y);
+
 					for (int i = 0; i < 3; i++)
 					{
 						for (int j = 0; j < 3; j++)
 						{
-							var tdist = new Vec(x, y) | ncenters[i, j];
+							var dif = p - ncenters[i, j];
+
+							var tdist = dif | dif;
 
 							biome = (tdist < dist) ? nbiomes[i, j] : biome;
 							dist = Math.Min(dist, tdist);
@@ -350,11 +355,11 @@ namespace LostWorlds
 		 *   - Likely some sourt of anti-aliassing situation, or bluring system with a random gradiant, or a random gradiant at first
 		 */
 		 
-		public static Vec chunkPos = new Vec(5, 3);
+		public static Vec chunkPos = new Vec(40, 20);
 		public static Vec position = new Vec();
 		public static Vec OldPos = new Vec();
 		public static Vec OldMousPos = new Vec();
-		public static Vec origin = new Vec(128, 128);
+		public static Vec origin = new Vec(384, 384);
 		public static double PixelTime = Time.Hour / 500;
 		public static bool DoesDrag = false;
         static BitmapSource[,] Bitmaps = new BitmapSource[3,3];
