@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
 using System.Dynamic;
+using System.Threading;
 using Utils;
 using MapFile;
 
@@ -270,95 +271,76 @@ namespace LostWorlds
 		
 		public byte[,] biomes;
 
-		public BitmapSource Bmp(Bitmap gen)
+		public BitmapSource Bmp()
 		{
 			BitmapSource output;
-			
-			for (int x = 0; x < gen.Width; x++)
+			var rng1 = new Random(319);
+			using (Bitmap gen = new Bitmap(256, 256))
 			{
-				for (int y = 0; y < gen.Height; y++)
+				for (int x = 0; x < gen.Width; x++)
 				{
-					gen.SetPixel(x, 255 - y, biomeColor[biomes[x, y]]);
+					for (int y = 0; y < gen.Height; y++)
+					{
+						gen.SetPixel(x, y, System.Drawing.Color.FromArgb(rng1.Next(64)+rng1.Next(64)+rng1.Next(64)+rng1.Next(64), biomeColor[biomes[x, y]]));
+					}
 				}
-			}
 
-			output =
-			System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-			gen.GetHbitmap(),
-			IntPtr.Zero,
-			Int32Rect.Empty,
-			BitmapSizeOptions.FromWidthAndHeight(256, 256));
-			return output;
+				output =
+				System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+				gen.GetHbitmap(),
+				IntPtr.Zero,
+				Int32Rect.Empty,
+				BitmapSizeOptions.FromWidthAndHeight(256, 256));
+			}
+				return output;
 		}
 
 		public ChunkInfo(GlobalData g, uint gx, uint gy)
 		{
 			biomes = new byte[256, 256];
 
-			/* New voronoi steps
-			 * 
-			 * - check to see if voronoi is needed
-			 * - check to see what voronoi quadrent the target point is in
-			 *   - check to see if voronoi is needed for target quadrent
-			 * 
-			 * What We Know:
-			 * - voronoi verteces are at the circomcenters of the vertecies of a Delaunay Triangulation
-			 *   - check matrix =	{{ a.x, a.y, a|a, 1 },
-			 *						 { b.x, b.y, b|b, 1 },
-			 *						 { c.x, c.y, c|c, 1 },
-			 *						 { d.x, d.y, d|d, 1 }}
-			 *						
-			 *   - with clockwise storage, the determanent will be negetive if the fourth point is invalid
-			 * - we can create 4 quadrents of regions per voronoi cell by comparing against neighboring cells
-			 * - each quadrent will have 4 quarter voronoi cells
-			 * - each quarter cell will have either 4 or 5 verteces
-			 * - each cell will have as it's verteces, it's center, two of it's midpoints to the adgacent centers, and either both or one of the circomcenters
-			 * 
-			 */
-			var nbiomes = new byte[3, 3];
 			var ncenters = new Vec[3, 3];
+			var nbiomes = new byte[3, 3];
 
-
-			// initialize the two arrays
-			for(uint x = 0; x < 3; x++)
+			//initialize the two neighbor arrays
+			for(int i = 0; i < 3; i++)
 			{
-				for (uint y = 0; y < 3; y++)
+				for (int j = 0; j < 3; j++)
 				{
-					var cent = g.GetChunk(gx + x - 1, gy + y - 1).BiomeCenter;
-					cent = cent.X * (Consts.Circ ^ (new Vec(0, cent.Y) / 64));
-					cent += new Vec((double)x - 1, (double)y - 1) * 256;
+					var tcent = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeCenter;							// grab the raw data form the global source
+					tcent = new Vec(128, 128) + (tcent * (Consts.Circ ^ (new Vec(0, tcent.Y) / 64)));					// use that raw data to create a random point based off of polar coordinates
+					tcent += new Vec(i - 1, j - 1) * 256;																// offset the point to be centered in the center of the chunk that it belongs to
 
-					ncenters[x, y] = cent;
-					nbiomes[x, y] = g.GetChunk(gx - 1 + x, gy - 1 + y).BiomeID;
+					ncenters[i, j] = tcent;																				// populate the neighbor centers with this new generated point
+					nbiomes[i, j] = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeID;							// populate the neighbor biomes with the proper biome ID
 				}
 			}
 
-			// Testing brute force
+			// for every point in the array, find what center it is closest to, and set itself to the same biome ID as the found nearest neighbor.
 			for (int x = 0; x < 256; x++)
 			{
 				for (int y = 0; y < 256; y++)
 				{
 					double dist = int.MaxValue;
-					byte sbiome = nbiomes[1, 1];
+					byte biome = nbiomes[1,1];
+
+					var p = new Vec(x, y);
 
 					for (int i = 0; i < 3; i++)
 					{
 						for (int j = 0; j < 3; j++)
 						{
-							var sample = new Vec(x, y);
-							var sdist = sample | ncenters[i, j];
+							var dif = p - ncenters[i, j];
 
-							sbiome = (sdist < dist) ? nbiomes[i, j] : sbiome;
-							dist = Math.Min(dist, sdist);
+							var tdist = dif | dif;
+
+							biome = (tdist < dist) ? nbiomes[i, j] : biome;
+							dist = Math.Min(dist, tdist);
 						}
 					}
-
-					biomes[x, y] = sbiome;
+					biomes[x, y] = biome;
 				}
 			}
-
-
-
 		}
 	}
 
@@ -373,44 +355,81 @@ namespace LostWorlds
 		 *   - Likely some sourt of anti-aliassing situation, or bluring system with a random gradiant, or a random gradiant at first
 		 */
 		 
-		public static Vec chunkPos = new Vec(5, 3);
+		public static Vec chunkPos = new Vec(40, 20);
 		public static Vec position = new Vec();
 		public static Vec OldPos = new Vec();
 		public static Vec OldMousPos = new Vec();
-		public static Vec origin = new Vec(284, 284);
+		public static Vec origin = new Vec(384, 384);
 		public static double PixelTime = Time.Hour / 500;
 		public static bool DoesDrag = false;
-
+        static BitmapSource[,] Bitmaps = new BitmapSource[3,3];
+      
 		public static GlobalData GlobalMap = new GlobalData("../../Map/world.gbd");
 
+        /*offloads chunk generation and bitmapsource making into worker threads
+         * makes new threadpool threads and calls the callback for them
+         */
+	    static void ThreadedChunkInfo()
+	    {
+            //countdown event to lock this thread until all the worker threads are done
+	        using (var countdown = new CountdownEvent(9))
+	        {
+	            for (var i = -1; i <= 1; i++) {
+	                for (var j = -1; j <= 1; j++) {
+	                    //queues a chunk to be processed
+	                    ThreadPool.QueueUserWorkItem(ThreadedChunkInfoCallback, new object[] { i,j,countdown});
+	                }
+	            }
+                
+                //wait for countdown event to reach 0
+	            countdown.Wait();
+	        }
+        }
+
+        /*callback for threading of chunk processing
+         * unwraps thread context object then processes the chunk and freezes the BitmapSource
+         */
+	    static void ThreadedChunkInfoCallback(object threadContext)
+	    {
+	        var context = threadContext as object[];
+	        var i = Convert.ToInt32(context[0]);
+	        var j = Convert.ToInt32(context[1]);
+	        var countdown = (CountdownEvent) context[2];
+
+	        Bitmaps[i + 1, j + 1] = (new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j))).Bmp();
+            //freezes the BitmapSource to make it accessible from other threads
+	        Bitmaps[i + 1, j + 1].Freeze();
+
+            //signals that this thread is done and ready to be synchronised with the main thread
+            countdown.Signal();
+	    }
 		public static void Update()
 		{
-			var chunks = new BitmapSource[3, 3];
-			using (Bitmap t = new Bitmap(256, 256))
-			{ 
-				for (int i = -1; i <= 1; i++)
+			/*var chunks = new ChunkInfo[3, 3];
+			for(int i = -1; i <= 1; i++)
+			{
+				for (int j = -1; j <= 1; j++)
 				{
-					for (int j = -1; j <= 1; j++)
-					{
-						var b = new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j));
-						chunks[i + 1, j + 1] = b.Bmp(t);
-						t.Save("test" + (i + chunkPos.X) + "," + (j + chunkPos.Y) + ".bmp");
-					}
+					chunks[i + 1, j + 1] = new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j));
 				}
-			}
-			
-			MainWindow.App.TopLeft.Source = chunks[0, 0];
-			MainWindow.App.Top.Source = chunks[1, 0];
-			MainWindow.App.TopRight.Source = chunks[2, 0];
+			}*/
 
-			MainWindow.App.Left.Source = chunks[0, 1];
-			MainWindow.App.Center.Source = chunks[1, 1];
-			MainWindow.App.Right.Source = chunks[2, 1];
+            //prepares BitmapSources to be used
+            ThreadedChunkInfo();
+            
+			MainWindow.App.TopLeft.Source = Bitmaps[0, 0];
+			MainWindow.App.Top.Source = Bitmaps[1, 0];
+			MainWindow.App.TopRight.Source = Bitmaps[2, 0];
 
-			MainWindow.App.BottomLeft.Source = chunks[0, 2];
-			MainWindow.App.Bottom.Source = chunks[1, 2];
-			MainWindow.App.BottomRight.Source = chunks[2, 2];
-			
+			MainWindow.App.Left.Source = Bitmaps[0, 1];
+			MainWindow.App.Center.Source = Bitmaps[1, 1];
+			MainWindow.App.Right.Source = Bitmaps[2, 1];
+
+			MainWindow.App.BottomLeft.Source = Bitmaps[0, 2];
+			MainWindow.App.Bottom.Source = Bitmaps[1, 2];
+			MainWindow.App.BottomRight.Source = Bitmaps[2, 2];
+
+
 			Console.WriteLine(chunkPos.X + ", " + chunkPos.Y);
 		}
 		 
@@ -538,8 +557,6 @@ namespace LostWorlds
 				Update();
 
 				oldDeltaPos = (Utils.Vec)e.GetPosition(Map);
-
-				Console.WriteLine(MapInfo.position.X + ", " + MapInfo.position.Y);
 			}
 		}
 
