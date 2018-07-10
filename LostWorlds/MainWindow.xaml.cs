@@ -267,144 +267,98 @@ namespace LostWorlds
 												 System.Drawing.Color.AntiqueWhite,
 												 System.Drawing.Color.Yellow,
 												 System.Drawing.Color.GreenYellow};
-
-		public Vec center;
+		
 		public byte[,] biomes;
 
-		public BitmapSource Bmp()
+		public BitmapSource Bmp(Bitmap gen)
 		{
 			BitmapSource output;
-			using (Bitmap gen = new Bitmap(256, 256))
+			
+			for (int x = 0; x < gen.Width; x++)
 			{
-				for (int x = 0; x < gen.Width; x++)
+				for (int y = 0; y < gen.Height; y++)
 				{
-					for (int y = 0; y < gen.Height; y++)
-					{
-						gen.SetPixel(x, y, biomeColor[biomes[x, y]]);
-					}
+					gen.SetPixel(x, 255 - y, biomeColor[biomes[x, y]]);
 				}
-
-				output =
-				System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-				gen.GetHbitmap(),
-				IntPtr.Zero,
-				Int32Rect.Empty,
-				BitmapSizeOptions.FromWidthAndHeight(256, 256));
 			}
-				return output;
+
+			output =
+			System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+			gen.GetHbitmap(),
+			IntPtr.Zero,
+			Int32Rect.Empty,
+			BitmapSizeOptions.FromWidthAndHeight(256, 256));
+			return output;
 		}
 
 		public ChunkInfo(GlobalData g, uint gx, uint gy)
 		{
-			center = g.GetChunk(gx, gy).BiomeCenter;
-			var biomec = g.GetChunk(gx, gy).BiomeID;
-
-			var neighbors = new Vec[3, 3];
-			var nbiomes = new byte[3, 3];
-
-			for (int ny = -1; ny < 1; ny++)
-			{
-				for (int nx = -1; nx < 1; nx++)
-				{
-					if ((nx + gx) >= 0 && (nx + gx) < g.Width && (ny + gy) >= 0 && (ny + gy) < g.Height)
-					{
-						var point = g.GetChunk((uint)(gx + nx), (uint)(gy + ny)).BiomeCenter;
-						point = point.X * (Consts.Circ ^ new Vec(0, point.Y / 64));
-						var offset = new Vec(256 * nx, 256 * ny);
-						point += offset;
-						point += new Vec(128, 128);
-
-						neighbors[nx + 1, ny + 1] = point;
-						nbiomes[nx + 1, ny + 1] = g.GetChunk((uint)(gx + nx), (uint)(gy + ny)).BiomeID;
-					}
-				}
-			}
-
 			biomes = new byte[256, 256];
 
-			var booltotal = false;
-			byte lastChecked = nbiomes[1, 1];
+			/* New voronoi steps
+			 * 
+			 * - check to see if voronoi is needed
+			 * - check to see what voronoi quadrent the target point is in
+			 *   - check to see if voronoi is needed for target quadrent
+			 * 
+			 * What We Know:
+			 * - voronoi verteces are at the circomcenters of the vertecies of a Delaunay Triangulation
+			 *   - check matrix =	{{ a.x, a.y, a|a, 1 },
+			 *						 { b.x, b.y, b|b, 1 },
+			 *						 { c.x, c.y, c|c, 1 },
+			 *						 { d.x, d.y, d|d, 1 }}
+			 *						
+			 *   - with clockwise storage, the determanent will be negetive if the fourth point is invalid
+			 * - we can create 4 quadrents of regions per voronoi cell by comparing against neighboring cells
+			 * - each quadrent will have 4 quarter voronoi cells
+			 * - each quarter cell will have either 4 or 5 verteces
+			 * - each cell will have as it's verteces, it's center, two of it's midpoints to the adgacent centers, and either both or one of the circomcenters
+			 * 
+			 */
+			var nbiomes = new byte[3, 3];
+			var ncenters = new Vec[3, 3];
 
-			foreach (byte b in nbiomes)
+
+			// initialize the two arrays
+			for(uint x = 0; x < 3; x++)
 			{
-				booltotal = lastChecked == b;
-				lastChecked = b;
-
-				if (!booltotal) { break; }
-			}
-
-			var doflood = true;
-
-			if (booltotal || doflood)
-			{
-				for (int tx = 0; tx < biomes.GetLength(0); tx++)
+				for (uint y = 0; y < 3; y++)
 				{
-					for (int ty = 0; ty < biomes.GetLength(1); ty++)
-					{
-						biomes[tx, ty] = nbiomes[1, 1];
-					}
+					var cent = g.GetChunk(gx + x - 1, gy + y - 1).BiomeCenter;
+					cent = cent.X * (Consts.Circ ^ (new Vec(0, cent.Y) / 64));
+					cent += new Vec((double)x - 1, (double)y - 1) * 256;
+
+					ncenters[x, y] = cent;
+					nbiomes[x, y] = g.GetChunk(gx - 1 + x, gy - 1 + y).BiomeID;
 				}
 			}
-			else
+
+			// Testing brute force
+			for (int x = 0; x < 256; x++)
 			{
-				for (int i = 0; i < 2; i++)
+				for (int y = 0; y < 256; y++)
 				{
-					for (int j = 0; j < 2; j++)
+					double dist = int.MaxValue;
+					byte sbiome = nbiomes[1, 1];
+
+					for (int i = 0; i < 3; i++)
 					{
-						int x1 = (i == 0) ? 0 : (int)center.X;
-						int x2 = (i == 0) ? (int)center.X : biomes.GetLength(0);
-
-						int y1 = (j == 0) ? 0 : (int)center.Y;
-						int y2 = (j == 0) ? (int)center.Y : biomes.GetLength(1);
-
-						var v1 = neighbors[i, j];
-						var v2 = neighbors[i, j + 1];
-						var v3 = neighbors[i + 1, j];
-						var v4 = neighbors[i + 1, j + 1];
-
-						var b1 = nbiomes[i, j];
-						var b2 = nbiomes[i, j + 1];
-						var b3 = nbiomes[i + 1, j];
-						var b4 = nbiomes[i + 1, j + 1];
-
-						var checking = new Vec[4] { v1, v2, v3, v4 };
-						var checkbiomes = new byte[4] { b1, b2, b3, b4 };
-
-						for (int cx = x1; cx < x2; cx++)
+						for (int j = 0; j < 3; j++)
 						{
-							for (int cy = y1; cy < y2; cy++)
-							{
-								if (b1 == b2 && b2 == b3 && b3 == b4)
-								{
-									biomes[cx, cy] = b1;
-								}
-								else
-								{
-									var sample = new Vec(cx, cy);
+							var sample = new Vec(x, y);
+							var sdist = sample | ncenters[i, j];
 
-									var curDist = int.MaxValue;
-
-									byte foundBiome = 0;
-
-									for (int k = 0; k < 4; k++)
-									{
-										var part = sample - checking[k];
-										var dist = part | part;
-
-										if (dist < curDist)
-										{
-											curDist = (int)dist;
-											foundBiome = checkbiomes[k];
-										}
-									}
-
-									biomes[cx, cy] = foundBiome;
-								}
-							}
+							sbiome = (sdist < dist) ? nbiomes[i, j] : sbiome;
+							dist = Math.Min(dist, sdist);
 						}
 					}
+
+					biomes[x, y] = sbiome;
 				}
 			}
+
+
+
 		}
 	}
 
@@ -423,35 +377,40 @@ namespace LostWorlds
 		public static Vec position = new Vec();
 		public static Vec OldPos = new Vec();
 		public static Vec OldMousPos = new Vec();
-		public static Vec origin = new Vec(128, 128);
+		public static Vec origin = new Vec(284, 284);
 		public static double PixelTime = Time.Hour / 500;
 		public static bool DoesDrag = false;
 
 		public static GlobalData GlobalMap = new GlobalData("../../Map/world.gbd");
-				
+
 		public static void Update()
 		{
-			var chunks = new ChunkInfo[3, 3];
-			for(int i = -1; i <= 1; i++)
-			{
-				for (int j = -1; j <= 1; j++)
+			var chunks = new BitmapSource[3, 3];
+			using (Bitmap t = new Bitmap(256, 256))
+			{ 
+				for (int i = -1; i <= 1; i++)
 				{
-					chunks[i + 1, j + 1] = new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j));
+					for (int j = -1; j <= 1; j++)
+					{
+						var b = new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j));
+						chunks[i + 1, j + 1] = b.Bmp(t);
+						t.Save("test" + (i + chunkPos.X) + "," + (j + chunkPos.Y) + ".bmp");
+					}
 				}
 			}
+			
+			MainWindow.App.TopLeft.Source = chunks[0, 0];
+			MainWindow.App.Top.Source = chunks[1, 0];
+			MainWindow.App.TopRight.Source = chunks[2, 0];
 
-			MainWindow.App.TopLeft.Source = chunks[0, 0].Bmp();
-			MainWindow.App.Top.Source = chunks[1, 0].Bmp();
-			MainWindow.App.TopRight.Source = chunks[2, 0].Bmp();
+			MainWindow.App.Left.Source = chunks[0, 1];
+			MainWindow.App.Center.Source = chunks[1, 1];
+			MainWindow.App.Right.Source = chunks[2, 1];
 
-			MainWindow.App.Left.Source = chunks[0, 1].Bmp();
-			MainWindow.App.Center.Source = chunks[1, 1].Bmp();
-			MainWindow.App.Right.Source = chunks[2, 1].Bmp();
-
-			MainWindow.App.BottomLeft.Source = chunks[0, 2].Bmp();
-			MainWindow.App.Bottom.Source = chunks[1, 2].Bmp();
-			MainWindow.App.BottomRight.Source = chunks[2, 2].Bmp();
-
+			MainWindow.App.BottomLeft.Source = chunks[0, 2];
+			MainWindow.App.Bottom.Source = chunks[1, 2];
+			MainWindow.App.BottomRight.Source = chunks[2, 2];
+			
 			Console.WriteLine(chunkPos.X + ", " + chunkPos.Y);
 		}
 		 
@@ -579,6 +538,8 @@ namespace LostWorlds
 				Update();
 
 				oldDeltaPos = (Utils.Vec)e.GetPosition(Map);
+
+				Console.WriteLine(MapInfo.position.X + ", " + MapInfo.position.Y);
 			}
 		}
 
