@@ -268,8 +268,7 @@ namespace LostWorlds
 												 System.Drawing.Color.AntiqueWhite,
 												 System.Drawing.Color.Yellow,
 												 System.Drawing.Color.GreenYellow};
-
-		public Vec center;
+		
 		public byte[,] biomes;
 
 		public BitmapSource Bmp()
@@ -281,7 +280,7 @@ namespace LostWorlds
 				{
 					for (int y = 0; y < gen.Height; y++)
 					{
-						gen.SetPixel(x, y, biomeColor[biomes[x, y]]);
+						gen.SetPixel(255 - x, 255 - y, biomeColor[biomes[x, y]]);
 					}
 				}
 
@@ -297,113 +296,44 @@ namespace LostWorlds
 
 		public ChunkInfo(GlobalData g, uint gx, uint gy)
 		{
-			center = g.GetChunk(gx, gy).BiomeCenter;
-			var biomec = g.GetChunk(gx, gy).BiomeID;
-
-			var neighbors = new Vec[3, 3];
-			var nbiomes = new byte[3, 3];
-
-			for (int ny = -1; ny < 1; ny++)
-			{
-				for (int nx = -1; nx < 1; nx++)
-				{
-					if ((nx + gx) >= 0 && (nx + gx) < g.Width && (ny + gy) >= 0 && (ny + gy) < g.Height)
-					{
-						var point = g.GetChunk((uint)(gx + nx), (uint)(gy + ny)).BiomeCenter;
-						point = point.X * (Consts.Circ ^ new Vec(0, point.Y / 64));
-						var offset = new Vec(256 * nx, 256 * ny);
-						point += offset;
-						point += new Vec(128, 128);
-
-						neighbors[nx + 1, ny + 1] = point;
-						nbiomes[nx + 1, ny + 1] = g.GetChunk((uint)(gx + nx), (uint)(gy + ny)).BiomeID;
-					}
-				}
-			}
-
 			biomes = new byte[256, 256];
 
-			var booltotal = false;
-			byte lastChecked = nbiomes[1, 1];
+			var ncenters = new Vec[3, 3];
+			var nbiomes = new byte[3, 3];
 
-			foreach (byte b in nbiomes)
+			//initialize the two neighbor arrays
+			for(int i = 0; i < 3; i++)
 			{
-				booltotal = lastChecked == b;
-				lastChecked = b;
-
-				if (!booltotal) { break; }
-			}
-
-			var doflood = true;
-
-			if (booltotal || doflood)
-			{
-				for (int tx = 0; tx < biomes.GetLength(0); tx++)
+				for (int j = 0; j < 3; j++)
 				{
-					for (int ty = 0; ty < biomes.GetLength(1); ty++)
-					{
-						biomes[tx, ty] = nbiomes[1, 1];
-					}
+					var tcent = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeCenter; // grab the raw data form the global source
+					tcent = tcent * (Consts.Circ ^ (new Vec(0, tcent.Y) / 64));					// use that raw data to create a random point based off of polar coordinates
+					tcent += new Vec(i - 1, j - 1) * 256;										// offset the point to be centered in the center of the chunk that it belongs to
+
+					ncenters[i, j] = tcent;														// populate the neighbor centers with this new generated point
+					nbiomes[i, j] = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeID; // populate the neighbor biomes with the proper biome ID
 				}
 			}
-			else
+
+			// for every point in the array, find what center it is closest to, and set itself to the same biome ID as the found nearest neighbor.
+			for (int x = 0; x < 256; x++)
 			{
-				for (int i = 0; i < 2; i++)
+				for (int y = 0; y < 256; y++)
 				{
-					for (int j = 0; j < 2; j++)
+					double dist = int.MaxValue;
+					byte biome = nbiomes[1,1];
+
+					for (int i = 0; i < 3; i++)
 					{
-						int x1 = (i == 0) ? 0 : (int)center.X;
-						int x2 = (i == 0) ? (int)center.X : biomes.GetLength(0);
-
-						int y1 = (j == 0) ? 0 : (int)center.Y;
-						int y2 = (j == 0) ? (int)center.Y : biomes.GetLength(1);
-
-						var v1 = neighbors[i, j];
-						var v2 = neighbors[i, j + 1];
-						var v3 = neighbors[i + 1, j];
-						var v4 = neighbors[i + 1, j + 1];
-
-						var b1 = nbiomes[i, j];
-						var b2 = nbiomes[i, j + 1];
-						var b3 = nbiomes[i + 1, j];
-						var b4 = nbiomes[i + 1, j + 1];
-
-						var checking = new Vec[4] { v1, v2, v3, v4 };
-						var checkbiomes = new byte[4] { b1, b2, b3, b4 };
-
-						for (int cx = x1; cx < x2; cx++)
+						for (int j = 0; j < 3; j++)
 						{
-							for (int cy = y1; cy < y2; cy++)
-							{
-								if (b1 == b2 && b2 == b3 && b3 == b4)
-								{
-									biomes[cx, cy] = b1;
-								}
-								else
-								{
-									var sample = new Vec(cx, cy);
+							var tdist = new Vec(x, y) | ncenters[i, j];
 
-									var curDist = int.MaxValue;
-
-									byte foundBiome = 0;
-
-									for (int k = 0; k < 4; k++)
-									{
-										var part = sample - checking[k];
-										var dist = part | part;
-
-										if (dist < curDist)
-										{
-											curDist = (int)dist;
-											foundBiome = checkbiomes[k];
-										}
-									}
-
-									biomes[cx, cy] = foundBiome;
-								}
-							}
+							biome = (tdist < dist) ? nbiomes[i, j] : biome;
+							dist = Math.Min(dist, tdist);
 						}
 					}
+					biomes[x, y] = biome;
 				}
 			}
 		}
