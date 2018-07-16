@@ -42,66 +42,84 @@ namespace LostWorlds
 
 	public class Character : Entity
 	{
-		public int Hunger = 7500;
-		public int Energy = 7500;
-		public int Thirst = 3500;
-		public uint Stomach = 500;
-		public uint Capacity = 1000;
+		public double Hunger = 7500;
+		public double Energy = 7500;
+		public double Thirst = 250;
+		public double Stomach = 500;
+		public double Capacity = 1000;
 
 		public Race race = Races.Human;
 
 		public Character()
 		{
 			canLevel = true;
-
 		}
 
 		public void Update()
 		{
-			Hunger -= (int)(Characters.Hrate * Time.Delta);
-			Thirst -= (int)(Characters.Trate * Time.Delta);
-			Stomach -= (uint)(Characters.Srate * Time.Delta);
+			Hunger -= (Characters.Hrate * Time.Delta);
+			Thirst -= (Characters.Trate * Time.Delta);
+			Stomach -= (Characters.Srate * Time.Delta);
+			Stomach = Math.Max(0, Stomach);
 			stats.Damage = Math.Max(0, stats.Damage - Characters.Drate * Time.Delta);
 
 		}
 
+		public void Sleep()
+		{
+			Characters.Hrate = 5000 / Time.Day;
+			Characters.Trate = 500 / Time.Day;
+			Characters.Drate = 300 / Time.Day;
+
+			MainWindow.App.Update();
+		}
+
+		public void Eat(Food item, double volume)
+		{
+			volume = Math.Min(volume, Capacity - Stomach);
+
+			Stomach += volume;
+			var food = item.Energy * volume;
+			var water = item.Water * volume;
+
+			Hunger += food;
+			Thirst += water;
+		}
+
 		public void EatDrink(uint food, uint water, uint volume)
 		{
-			Hunger += (int)food;
-			Thirst += (int)water;
+			Hunger += food;
+			Thirst += water;
 			Stomach += volume;
 		}
 
-		public void Drink(uint water)
+		public void Drink(double water)
 		{
-			Thirst += (int)water;
-			Capacity += water;
+			water = Math.Min(water, (Capacity - Stomach));
+
+			Thirst += water;
+			Stomach += water;
 		}
 
 		public SolidColorBrush HungerColor()
 		{
 			var col = (byte)(255 * Math.Pow(Math.E, -Math.Pow(Hunger, 2) / Math.Pow(7500 / 3, 2))); //this logic plots hunger on a more accurate scale, that is asymtotic, so the entire number line maps to between 0, and 255. 7500 is the daily requirement in kJ for energy
 
-			//ternary would be much nicer here, but some people don't like it, it would be return Hunger >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
-
-			//awesome! I don't mind ternary at all, it tends to clean things up quite nicely.
-
 			return Hunger >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
 		}
 		public SolidColorBrush ThirstColor()
 		{
-			var col = (byte)(255 * Math.Pow(Math.E, -Thirst * Thirst / Math.Pow(3500 / 3, 2))); // This is a slightly different requirement, so, there is that. But hey, water is important as well, so, the player will be able to manage their water intake a little better, or more accurately, more accurately.
-
-			//ternary would look like return Thirst >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
+			var col = (byte)(255 * Math.Pow(Math.E, -Thirst * Thirst / Math.Pow(250 / 3, 2))); // This is a slightly different requirement, so, there is that. But hey, water is important as well, so, the player will be able to manage their water intake a little better, or more accurately, more accurately.
+			
 			return Thirst >= 0 ? new SolidColorBrush(Color.FromRgb(col, col, col)) : new SolidColorBrush(Color.FromRgb(255, col, col));
 		}
 	}
 
 	public static class Characters
 	{
-		public static double Hrate = 7500 / Time.Day;
-		public static double Trate = 3500 / Time.Day;
-		public static double Srate = 1 / (4 * Time.Hour);
+		public static double Hrate = 40000;
+		public static double Trate = 2000;
+		public static double Srate = 1000 / (4.0 * Time.Hour);
 		public static double Drate = 100 / Time.Day;
 
 		public static Character Player = new Character()
@@ -128,9 +146,9 @@ namespace LostWorlds
 				},
 				death = new List<string>
 				{
-					"You pass out from the pain, only to wake up back at your home.",
-					"The pain becomes too much for you, and you collapse into unconsiousness, waking up at your home.",
-					"You stumble back from the last hit, and drop to one knee as your vission collapses to a point, and fading into black. You wake up at your little home."
+					"You pass out from the pain, only to wake up back you last fell asleep.",
+					"The pain becomes too much for you, and you collapse into unconsiousness, waking up where you last fell asleep.",
+					"You stumble back from the last hit, and drop to one knee as your vission collapses to a point, and fading into black. You wake up where you last fell asleep."
 				}
 			},
 			DT = new Entity.damageText()

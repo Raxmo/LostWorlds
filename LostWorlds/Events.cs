@@ -60,6 +60,410 @@ namespace LostWorlds
 	}
 	public static class Events
 	{
+		public static Event Sleep = new Event()
+		{
+			ActionTime = 8 * Time.Hour,
+			Text = "You look around and find a nice spot to hunker down and catch some sleep for a few hours.",
+			act = (() =>
+			{
+				Characters.Player.Sleep();
+			}),
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.Curr.Load();
+					})
+				}
+			}
+		};
+
+		public static Event ForestForage = new Event()
+		{
+			ActionTime = 30 * Time.Minute,
+			Text = "You look around the area for a little bit to find some food to eat. You manage to find some berries to munch on",
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Eat(Foods.Berries, 1000);
+			}),
+			options = new List<Event.option>()
+			{
+				new Event.option()
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.Forest.Load();
+					})
+				}
+			}
+		};
+
+		public static Event ForestDrink = new Event()
+		{
+			ActionTime = 15 * Time.Minute,
+			Text = "You decide to look for a stream nearby and have yourself a little drink of water.",
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Drink(1000);
+			}),
+			options = new List<Event.option>()
+			{
+				new Event.option()
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.Forest.Load();
+					})
+				}
+			}
+		};
+
+		public static Event ForestEvent = new Event()
+		{
+			Text = "You find yourself in a vast forest. Plenty of trees and animals fill the forest. You'll have no troubles finding food or water here.",
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Forage",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						ForestForage.Load();
+					})
+
+				},
+				new Event.option()
+				{
+					name = "Drink",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						ForestDrink.Load();
+					})
+				},
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				}
+			}
+		};
+
+		public static Event RiverFish = new Event()
+		{
+			Text = "You decide to take a little time and catch a fish or two to eat.",
+			ActionTime = 30 * Time.Minute,
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Eat(Foods.Fish, 1000);
+			}),
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.River.Load();
+					})
+				}
+			}
+		};
+
+		public static Event RiverDrink = new Event()
+		{
+			Text = "You dip yourself down into the river to have yourself a little drink",
+			ActionTime = 5 * Time.Minute,
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Drink(1000);
+			}),
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.River.Load();
+					})
+				}
+			}
+		};
+
+		public static Event RiverEvent = new Event()
+		{
+			Text = "You find yourself in an area filled with small ponds, lakes and rivers. Fish and water will not be much of an issue for you here.",
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Fish",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						RiverFish.Load();
+					})
+				},
+				new Event.option()
+				{
+					name = "Drink",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						RiverDrink.Load();
+					})
+				},
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				}
+			}
+		};
+
+		public static Event MountainEvent = new Event()
+		{
+			Text = "You find yourself on a mountain, the rocky terraign does not lend itself well for food, but you'll be able to gather resources here relatively easily.",
+			options = new List<Event.option>
+			{				
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				}
+			}
+		};
+
+		public static Event DesertForage = new Event()
+		{
+			Text = "You look around and only find cacti. They'll have to do for now, not much in the way of energy, but full of water.",
+			ActionTime = 15 * Time.Minute,
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Eat(Foods.Cactus, 1000);
+			}),
+			options = new List<Event.option>
+			{
+				new Event.option
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.Desert.Load();
+					})
+				},
+			}
+		};
+
+		public static Event DesertEvent = new Event()
+		{
+			Text = "You find yourself in a sea of sand. Water will be scarce here, and you'll likely have a hard time finding any of it. You will still be able to gather resources here, and even find food if you look hard enough.",
+			options = new List<Event.option>
+			{
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				},
+				new Event.option
+				{
+					name = "Forage",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						DesertForage.Load();
+					})
+				}
+			}
+		};
+
+		public static Event BadlandsEvent = new Event()
+		{
+			Text = "The badlands are berren, nothing around you of any use. The dirt is hard, the sky is red, and you already know that there are very unpleasant things lurking around you, ready to take your life at any moment. Surviving here is not something that can be done, you should leave as soon as you can.",
+			options = new List<Event.option>
+			{
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				}
+			}
+		};
+
+		public static Event RuinsEvent = new Event()
+		{
+			Text = "You are in a kind of ruin, seems to be what once was industrial, with structures that are now very much no longer functional, or even likely safe to enter.",
+			options = new List<Event.option>
+			{
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				}
+			}
+		};
+
+		public static Event SwampFish = new Event()
+		{
+			Text = "You decide to fish around for something to eat, and you manage tocatch a nice sized fish.",
+			ActionTime = Time.Hour,
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Eat(Foods.Fish, 1000);
+			}),
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.Swamp.Load();
+					})
+				}
+			}
+		};
+
+		public static Event SwampForage = new Event()
+		{
+			Text = "You look around for something to eat, and you find a good number of mushrooms to eat. They aren't that filling or even energy dense. You might want to look for some better food.",
+			ActionTime = 15.0 * Time.Minute,
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Eat(Foods.Mushrooms, 1000);
+			})
+		};
+
+		public static Event SwampEvent = new Event()
+		{
+			Text = "You are in a swamp. The scent in the air is acrid and sour. You should be able to find mushrooms and fish, but clean water will be rather dificult for you to find.",
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Fish",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						SwampFish.Load();
+					})
+				},
+				new Event.option()
+				{
+					name = "Forage",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						SwampForage.Load();
+					})
+				},
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				}
+			}
+
+		};
+
+		public static Event PlainsForage = new Event()
+		{
+			Text = "You look around and gather some grain to eat. You manage to find a good amount of Rye.",
+			ActionTime = 30 * Time.Minute,
+			act = (() =>
+			{
+				Characters.Hrate = 7500;
+				Characters.Player.Eat(Foods.Rye, 1000);
+			}),
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Continue",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = true;
+						Areas.Plains.Load();
+					})
+				}
+			}
+		};
+
+		public static Event PlainsEvent = new Event()
+		{
+			Text = "The Plains of the world are full of lush grasses and rolling hills. It's easy to move around in the plains, with not much in your way. You'll ba able to find sources of water relatively easy here, as well as plenty of food to find and eat.",
+			options = new List<Event.option>
+			{
+				new Event.option()
+				{
+					name = "Forage",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						PlainsForage.Load();
+					})
+				},
+				new Event.option
+				{
+					name = "Sleep",
+					optionClick = (() =>
+					{
+						MapInfo.CanDrag = false;
+						Sleep.Load();
+					})
+				}
+			}
+		};
+
 		public static Event PlayerResults = new Event() //dear god, this section is a wall of text. and as soon as I re-work the stats, it's only going to be worse. Fun time ahead of me.
 		{
 			act = (() =>
@@ -204,6 +608,7 @@ namespace LostWorlds
 					optionClick = (()=>
 					{
 						Areas.Starting.Load();
+						MapInfo.CanDrag = true;
 					})
 				},
 				new Event.option()

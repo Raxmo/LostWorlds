@@ -124,7 +124,7 @@ namespace LostWorlds
 				return DT.critical;
 			}
 		}
-		
+
 		public string Attack(Entity target)
 		{
 			/* Combat Logic:
@@ -137,7 +137,7 @@ namespace LostWorlds
 			 * how hard can you hit them? [strength]
 			 *    how well can they take the hit? [pain tolerance]    
 			 */
-			
+
 			var a = Utils.Gaussian(stats.Analysis, 15) - target.stats.Focus;
 			var fm = Utils.Gaussian(stats.FineMoter, 15) - target.stats.Flexibility;
 			var s = Utils.Gaussian(stats.Strength, 15) - target.stats.PainTolerance;
@@ -148,7 +148,7 @@ namespace LostWorlds
 
 			target.isAlive = (Utils.Gaussian(target.stats.PainTolerance, 15) > target.stats.Damage);
 
-			return (dmg > 0) ? AT.hit[Utils.rand.Next(AT.hit.Count())] : AT.miss[Utils.rand.Next(AT.miss.Count())];
+			return AT.attacking[Utils.rand.Next(AT.attacking.Count())] + ((dmg > 0) ? AT.hit[Utils.rand.Next(AT.hit.Count())] : AT.miss[Utils.rand.Next(AT.miss.Count())]);
 		}		
 	}
 
@@ -307,12 +307,12 @@ namespace LostWorlds
 			{
 				for (int j = 0; j < 3; j++)
 				{
-					var tcent = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeCenter;							// grab the raw data form the global source
-					tcent = new Vec(128, 128) + (tcent * (Consts.Circ ^ (new Vec(0, tcent.Y) / 64)));					// use that raw data to create a random point based off of polar coordinates
-					tcent += new Vec(i - 1, j - 1) * 256;																// offset the point to be centered in the center of the chunk that it belongs to
+					var tcent = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeCenter;			// grab the raw data form the global source
+					tcent = new Vec(128, 128) + (tcent * (Consts.Circ ^ (new Vec(0, tcent.Y) / 64)));	// use that raw data to create a random point based off of polar coordinates
+					tcent += new Vec(i - 1, j - 1) * 256;												// offset the point to be centered in the center of the chunk that it belongs to
 
-					ncenters[i, j] = tcent;																				// populate the neighbor centers with this new generated point
-					nbiomes[i, j] = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeID;							// populate the neighbor biomes with the proper biome ID
+					ncenters[i, j] = tcent;																// populate the neighbor centers with this new generated point
+					nbiomes[i, j] = g.GetChunk((uint)(gx - 1 + i), (uint)(gy - 1 + j)).BiomeID;			// populate the neighbor biomes with the proper biome ID
 				}
 			}
 
@@ -355,16 +355,18 @@ namespace LostWorlds
 		 *   - Likely some sourt of anti-aliassing situation, or bluring system with a random gradiant, or a random gradiant at first
 		 */
 		 
-		public static Vec chunkPos = new Vec(40, 20);
+		public static Vec chunkPos = new Vec(1280, 640);
 		public static Vec position = new Vec();
 		public static Vec OldPos = new Vec();
 		public static Vec OldMousPos = new Vec();
-		public static Vec origin = new Vec(384, 384);
+		public static Vec origin = new Vec(284, 284);
 		public static double PixelTime = Time.Hour / 500;
 		public static bool DoesDrag = false;
+		public static byte[,] BIDSource = new byte[256, 256];
         static BitmapSource[,] Bitmaps = new BitmapSource[3,3];
+		public static bool CanDrag = false;
       
-		public static GlobalData GlobalMap = new GlobalData("../../Map/world.gbd");
+		public static GlobalData GlobalMap = new GlobalData("world.gbd");
 
         /*offloads chunk generation and bitmapsource making into worker threads
          * makes new threadpool threads and calls the callback for them
@@ -396,7 +398,11 @@ namespace LostWorlds
 	        var j = Convert.ToInt32(context[1]);
 	        var countdown = (CountdownEvent) context[2];
 
-	        Bitmaps[i + 1, j + 1] = (new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j))).Bmp();
+			var sourcething = (new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j)));
+
+			BIDSource = (i == 0 && j == 0) ? sourcething.biomes : BIDSource;
+
+	        Bitmaps[i + 1, j + 1] = sourcething.Bmp();
             //freezes the BitmapSource to make it accessible from other threads
 	        Bitmaps[i + 1, j + 1].Freeze();
 
@@ -405,15 +411,6 @@ namespace LostWorlds
 	    }
 		public static void Update()
 		{
-			/*var chunks = new ChunkInfo[3, 3];
-			for(int i = -1; i <= 1; i++)
-			{
-				for (int j = -1; j <= 1; j++)
-				{
-					chunks[i + 1, j + 1] = new ChunkInfo(GlobalMap, (uint)(chunkPos.X + i), (uint)(chunkPos.Y + j));
-				}
-			}*/
-
             //prepares BitmapSources to be used
             ThreadedChunkInfo();
             
@@ -428,9 +425,6 @@ namespace LostWorlds
 			MainWindow.App.BottomLeft.Source = Bitmaps[0, 2];
 			MainWindow.App.Bottom.Source = Bitmaps[1, 2];
 			MainWindow.App.BottomRight.Source = Bitmaps[2, 2];
-
-
-			Console.WriteLine(chunkPos.X + ", " + chunkPos.Y);
 		}
 		 
 	}
@@ -447,6 +441,8 @@ namespace LostWorlds
 		}
 
 		public static MainWindow App;
+		public static BiomeEvents CurrentBiome;
+		public static byte CurrBID;
 
 		public void Update()
 		{
@@ -468,15 +464,14 @@ namespace LostWorlds
 			Tracker.Children.Add(Sun.Horizon);
 			Sun.Draw();
 			Tracker.Children.Add(Sun.Circle);
-			
+						
 			Time.Delta = 0;
 		}
 
 
 		private void button_Click(object sender, RoutedEventArgs e)
 		{
-            //.Any() would do it without comparison <- how do you mean? not very familiar with C# to be frank, feel free to redo this code so I can see how to use that, seems a lot cleaner to me
-			if (Areas.Back.Count() > 0)
+			if (Areas.Back.Any())
 			{
 				Time.Delta = Areas.Curr.TravelTime;
 				Areas.Back[Areas.Back.Count() - 1].Load();
@@ -489,7 +484,6 @@ namespace LostWorlds
 		{
 			Time.Delta = Areas.Curr.ReturnTime;
 			Areas.Back.Clear();
-			Areas.Home.Load();
 			Update();
 		}
 
@@ -502,8 +496,6 @@ namespace LostWorlds
 			MapInfo.OldMousPos = (Vec)e.GetPosition(Map) - new Vec(100, 100);
 			MapInfo.OldPos = MapInfo.position;
 			MapInfo.DoesDrag = true;
-
-			Console.WriteLine("clicked!");
 		}
 
 		private void Map_MouseUp(object sender, MouseButtonEventArgs e)
@@ -517,7 +509,7 @@ namespace LostWorlds
 			 * when draging, capture the relative position of the mouse to the map image
 			 * set the position of the map image to the position of the mouse 
 			 */
-			if(MapInfo.DoesDrag)
+			if(MapInfo.DoesDrag && MapInfo.CanDrag)
 			{
 				MapInfo.position = MapInfo.OldPos + ((Vec)e.GetPosition(Map) - new Vec(100, 100) - MapInfo.OldMousPos);
 				
@@ -546,15 +538,27 @@ namespace LostWorlds
 					MapInfo.chunkPos.Y -= 1;
 					MapInfo.Update();
 				}
+				
+				var nx = (MapInfo.position.X + 256 + 128) % 256;
+				var ny = (MapInfo.position.Y + 256 + 128) % 256;
 
+				nx = 255 - nx;
+				ny = 255 - ny;
+
+				CurrBID = MapInfo.BIDSource[(int)nx, (int)ny];
+				
 				Canvas.SetLeft(Chunks, MapInfo.position.X - MapInfo.origin.X);
 				Canvas.SetTop(Chunks, MapInfo.position.Y - MapInfo.origin.Y);
 
 				Utils.Vec deltaPos = (Utils.Vec)e.GetPosition(Map) - oldDeltaPos;
 
+				BiomeEventData.Distance += Math.Sqrt(deltaPos | deltaPos);
+
 				Time.Delta = (uint)(Math.Sqrt(deltaPos | deltaPos) * MapInfo.PixelTime);
 
 				Update();
+
+				BiomeEventList.BiomeList[CurrBID].Load();
 
 				oldDeltaPos = (Utils.Vec)e.GetPosition(Map);
 			}

@@ -27,7 +27,7 @@
         <Label x:Name="PartnerHunger" Content="Hungry" HorizontalAlignment="Right" Margin="0,72,10,0" VerticalAlignment="Top" Width="95" Foreground="Black"/>
         <Label x:Name="PlayerThirst" Content="Thirsty" HorizontalAlignment="Right" Margin="0,103,115,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="Black"/>
         <Label x:Name="PartnerThirst" Content="Thirsty" HorizontalAlignment="Right" Margin="0,103,10,0" VerticalAlignment="Top" Width="95" Foreground="Black"/>
-        <Button x:Name="Back" Content="Back" HorizontalAlignment="Right" Margin="0,134,115,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="White" BorderBrush="White" Click="button_Click"/>
+        
         <Grid x:Name="Options" HorizontalAlignment="Right" Margin="0,159,10,0" VerticalAlignment="Top" Width="200" MinHeight="20" x:FieldModifier="public">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -42,7 +42,7 @@
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
         </Grid>
-        <Button x:Name="Home" Content="Go Home" HorizontalAlignment="Right" Margin="0,134,10,0" VerticalAlignment="Top" Width="95" Background="Black" Foreground="White" BorderBrush="White" Click="home_Click"/>
+        
         <Canvas x:Name="Map" HorizontalAlignment="Right" Margin="0,0,10,220" Width="200" Height="200" VerticalAlignment="Bottom" MouseMove="Map_MouseMove" MouseDown="Map_MouseDown" MouseUp="Map_MouseUp" Background="Black" MouseLeave="Map_MouseLeave">
             <Canvas.Clip>
                 <EllipseGeometry Center="100,100" RadiusX="100" RadiusY="100"/>
@@ -57,7 +57,9 @@
                 <Image Name="TopRight" Height="256" Canvas.Left="512" Canvas.Top="0" Width="256"/>
                 <Image Name="BottomLeft" Height="256" Canvas.Left="0" Canvas.Top="512" Width="256"/>
                 <Image Name="BottomRight" Height="256" Canvas.Left="512" Canvas.Top="512" Width="256"/>
+                <Rectangle Name="chunkBorder" Height="256" Width="256" Canvas.Left="256" Canvas.Top="256" Stroke="Gray" StrokeThickness="1"/>
             </Canvas>
+            <Ellipse Name="loc" Height="6" Width="6" Canvas.Left="97" Canvas.Top="97" Stroke="White" StrokeThickness="1" ></Ellipse>
         </Canvas>
 
     </Grid>

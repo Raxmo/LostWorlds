@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C62E08A8-3AE6-4A98-A10F-095A75414008}</ProjectGuid>
+    <ProjectGuid>{D8B482FF-7783-4A73-863F-ACDDF202F963}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>LostWorlds</RootNamespace>
     <AssemblyName>LostWorlds</AssemblyName>
@@ -76,6 +76,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Biomes.cs" />
     <Compile Include="Characters.cs" />
     <Compile Include="Encounters.cs" />
     <Compile Include="Enemies.cs" />
@@ -136,7 +137,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Utils.dll" />
     <Resource Include="Map\chunk,0,0.bmp" />
     <Resource Include="Map\chunk,0,1.bmp" />
     <Resource Include="Map\chunk,0,10.bmp" />
@@ -258,7 +258,6 @@
     <Resource Include="Map\chunk,9,7.bmp" />
     <Resource Include="Map\chunk,9,8.bmp" />
     <Resource Include="Map\chunk,9,9.bmp" />
-    <Content Include="MapFile.dll" />
     <Content Include="Map\Map Generator.exe" />
     <Resource Include="Map\world.bmp" />
   </ItemGroup>

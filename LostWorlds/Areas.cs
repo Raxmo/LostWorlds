@@ -30,8 +30,8 @@ namespace LostWorlds
 		public uint FirstVisitTime = 0;
 		public string FirstVisitText = "";
 		public Action Act = null;
-		public double Hrate = 7500;
-		public double Trate = 3500;
+		public double Hrate = 40000;
+		public double Trate = 2000;
 
 		private void LoadOptions()
 		{
@@ -60,7 +60,6 @@ namespace LostWorlds
 		{
 			var clicked = (Button)sender;
 			var index = Int32.Parse(clicked.Name.Split('b')[1]);
-			Areas.Back.Add(this);
 			Time.Delta = Options[index].TravelTime;
 			Options[index].Load();
 		}
@@ -101,218 +100,69 @@ namespace LostWorlds
 
 		// You'll need to list the areas in reverse order, due to limitations in hoisting, the FIRST area needs to be at the BOTTOM, and the FARTHEST area needs to be at the TOP.
 
-        //all of these could probably be made readonly <- most areas will need to mutate depending on if the player had visited the area before or not.
-		
-		public static Area Harvest = new Area()
+		//all of these could probably be made readonly <- most areas will need to mutate depending on if the player had visited the area before or not.
+
+		public static Area Badlands = new Area()
 		{
-			Name = "Harvest",
-			ActionTime = Time.Hour,
-			ReturnTime = 15 * 60,
+			Name = "Badlands",
 			IsFirstVisit = false,
-			Text = "You decide to pull some of the berries and some of the other vegies in the medow to bring back to your little camp for future consumption.",
-			Act = (() =>
-			{
-				Larder.Add(Foods.Berries, 1000);
-			})
+			Text = "The badlands are unfair, and undying. You will not survive long in these dessolate wastelands.",
+			Event = Events.BadlandsEvent
+
 		};
 
-		public static Area Medow = new Area()
+		public static Area Forest = new Area()
 		{
-			Name = "Medow",
-			FirstVisitTime = 15 * Time.Minute,
-			TravelTime =15 * Time.Minute,
-			ReturnTime = 15 * Time.Minute,
-			FirstVisitText = "You go off to the near-by medow and look around at all the lovely flowers and berry bushes. You can tell that there are probably plenty of eatable veggies around in this area if you decide to harvest them from the wild.",
-			Text = "You return to the near-by medow and look around the place for a moment, thinking about what you should do. You still remember where all the good harvestable food stuffs are located in the medow.",
-			Options = new List<Area>()
-			{
-				Harvest
-			}
-		};
-
-		public static Area Cliff = new Area()
-		{
-			Name = "Cliff",
-			ActionTime = 90 * Time.Minute,
-			ReturnTime = 15 * Time.Minute,
-			TravelTime = 15 * Time.Minute,
-			Hrate = 15000,
-			Trate = 7000,
-			Text = "You look up at the cliff, noticing quite a good number of hand-holds. You become confident that you can climb the whole thing in one go, so you start to climb up the side of the cliff. You take a good while to reach the top, carefully climbing as you go, given you have no safty net of any kind to keep you from falling off, but you do end up reaching the top to see a beautifull flowery meddow before you. you do notice a relatively fast and safe way back down the cliff side to your little camp below.",
-			FirstVisitText = "You look up at the cliff, noticing quite a good number of hand-holds. You become confident that you can climb the whole thing in one go, so you start to climb up the side of the cliff. You take a good while to reach the top, carefully climbing as you go, given you have no safty net of any kind to keep you from falling off, but you do end up reaching the top to see a beautifull flowery meddow before you. you do notice a relatively fast and safe way back down the cliff side to your little camp below.",
-			Act = (() =>
-			{
-				if(Cliff.IsFirstVisit)
-				{
-					Home.Options.Add(Medow);
-				}
-			})
-		};
-
-		public static Area Fish = new Area()
-		{
-			Name = "Go Fish",
-			ActionTime = Time.Hour,
-			ReturnTime = 15 * Time.Minute,
+			Name = "Forest",
 			IsFirstVisit = false,
-			Text = "You look into the stream and spot some fish swimming around so you decide to try and catch some. You sit down at the edge of the stream and rest your hand in the water, gently wrigling your finger to entice the fish in the stream. After some time, you manage to catch enough for maybe a single meal, a job well done.",
-			Act = (() =>
-			{
-				Larder.Add(Foods.Fish, 1000);
-			})
+			Text = "The forests are inviting, and calm. Plenty of wildlife to be had as well as fresh water.",
+			Event = Events.ForestEvent
 		};
 
-		public static Area Stream = new Area()
+		public static Area Plains = new Area()
 		{
-			Name = "Stream",
-			FirstVisitTime = 15 * Time.Minute,
-			TravelTime = 15 * Time.Minute,
-			ReturnTime = 15 * 60,
-			Text = "Your curiosity about the sound of the stream draws you towards it, and you decide that you should perhapse go and visit the stream and see what kinds of things you can find there. On ariving at the stream, you see that the water is cristal clear, and there are even some small fish swimming in it. Intrigued, you try and catch but it slips from your grasp, maybe you should spend some more time and try a little harder.",
-			FirstVisitText = "Your curiosity about the sound of the stream draws you towards it, and you decide that you should perhapse go and visit the stream and see what kinds of things you can find there. On ariving at the stream, you see that the water is cristal clear, and there are even some small fish swimming in it. Intrigued, you try and catch but it slips from your grasp, maybe you should spend some more time and try a little harder.",
-			Options = new List<Area>()
-			{
-				Fish
-			},
-			Act = (() =>
-			{
-				var rand = new Random();
-				var tart = rand.NextDouble();
-				if (tart < 0.25)
-				{
-					Stream.Encounter = new Encounters.tester(); //not sure if this will lead to some memory leak issues during run-time, might want to check for that.
-				}
-				else
-				{
-					Stream.Encounter = null;
-				}
-			})
-		};
-
-		public static Area Drink = new Area()
-		{
-			Name = "Drink",
-			ActionTime = 5 * Time.Minute,
-			ReturnTime = 0,
+			Name = "Plains",
 			IsFirstVisit = false,
-			Text = "You move over to the fresh spring and take a drink of fresh water. the cool water tastes rather lovely, and clean. The water is likely the best quality that you could manage in this area",
-			Act = (() =>
-			{
-				foreach(var c in Characters.Active)
-				{
-					c.Drink(1000);
-				}
-			})
+			Text = "The plains spread wide, fields of tall grass everywhere, stretching out as far as you can see. Plenty of roaming herding animals, and even easily accessable water can be found.",
+			Event = Events.PlainsEvent
 		};
 
-		public static Area EatDrink = new Area()
+		public static Area Desert = new Area()
 		{
-			Name = "Eat and Drink",
-			ActionTime = 30 * 60,
-			ReturnTime = 0,
+			Name = "Desert",
 			IsFirstVisit = false,
-			Act = (() =>
-			{
-				if(Larder.Volume > 0)
-				{
-					if(Larder.Volume >= 750)
-					{
-						EatDrink.Text = "You decide to sit down and have a little something to eat and drink. You walk over to the pile of food you have set up and gather a little bit of it to sit down and eat. While eating you listen to the trees swaying in the gentle breeze, and you move over to the spring in the side of the cliff to have a little water for yourself.";
-						Larder.Volume -= 750;
-						foreach(var c in Characters.Active)
-						{
-							var room = c.Capacity - c.Stomach;
-							c.EatDrink(Larder.Density * (room * 75) / 100, Larder.Water * (room * 75) / 100 + (room * 250) / 1000, 1000);
-						}
-					}
-					else
-					{
-						EatDrink.Text = "You decide to have something to eat, but you come to the conclusion that there isn't really enough for a full meal, but you decide to eat the rest of it anyway and perhaps go to gather up some more food at a later time.";
-						uint eaten = 0;
-
-						foreach(var c in Characters.Active)
-						{
-							var room = c.Capacity - c.Stomach;
-							if(room > Larder.Volume)
-							{
-								eaten = Larder.Volume;
-								Larder.Density = 0;
-							}
-							else
-							{
-								eaten = Larder.Volume - c.Stomach;
-							}
-							c.EatDrink(Larder.Density * (eaten * 75) / 100, Larder.Water * (eaten * 75) / 100 + (room * 250) / 1000, 1000);
-						}
-						
-						Larder.Volume -= eaten;
-					}
-				}
-				else
-				{
-					EatDrink.Text = "You are saddened by the fact that you have no food at the moment, but you can still get some water to drink from the stream. it won't stop you from being hungry, but at least you won't be dehidrated";
-					foreach(var c in Characters.Active)
-					{
-						c.Drink(c.Capacity - c.Stomach);
-					}
-				}
-			})
+			Text = "The desert is a dessolate place, with nothing but sand all around you. Water will be very difficult to find, and it'll be hard to find food as well."
 		};
 
-		// should overhaul the sleeping requirements, would be interesting to have different sleeping schedules and have sleep hinder your capabilities
-		public static Area Sleep = new Area()
+		public static Area Mountains = new Area()
 		{
-			Name = "Sleep",
-			ActionTime = 60 * 60 * 8,
-			ReturnTime = 0,
-			Hrate = 5000,
-			Trate = 5000,
+			Name = "Mountain",
 			IsFirstVisit = false,
-			Text = "You decide to sleep for the next 8 hours or so. You wake up well rested, and when the time comes for it, you would have saved as well, but that's currently not a thing yet, come back later for that one."
+			Text = "The mountains are plooms of rock. Not many things grow on the mountains, but you'll be able to find some animals living in caves and other naturaly forming structures",
+			Event = Events.MountainEvent
 		};
 
-		//the home description could use a little work
-		public static Area Home = new Area()
+		public static Area Ruins = new Area()
 		{
-			Name = "Home",
+			Name = "Ruins",
 			IsFirstVisit = false,
-			Options = new List<Area>()
-			{
-				EatDrink,
-				Drink,
-				Sleep,
-				Stream,
-				Cliff
-			},
-			Act = (() =>
-			{
-				Back = new List<Area>()
-				{
-					Home
-				};
-				string larder;
-				if(Larder.Volume == 0)
-				{
-					larder = "You look at a small alcove under the overhang and notice an absence of food there.";
-				}
-				else if(Larder.Volume  <= 1000)
-				{
-					larder = "You look at the small pile of food in the corner of your little camp. You think that you might be able to get maybe a single meal out of it in it's current state, and that meal isn't even going to be a full meal.";
-				}
-				else if(Larder.Volume <= 3000)
-				{
-					larder = "you glance over at the pile of food in the alcove, and you feel like you have only enough food for the day, tops. might be wise to use the day to go out and search for some more food.";
-				}
-				else if(Larder.Volume <= 21000)
-				{
-					larder = "You look over at the noticable pile of food in the corner and smile. It should be enough for a few days at least.";
-				}
-				else
-				{
-					larder = "You spot the large pile of food in the little alcove you are using to store it all. The pile seems big enough to last you more than a week.";
-				}
-				Home.Text = "You are at the little camp site that you've made for yourself at the base of a small cliff, under an outcropping of rock to shield you from the elements a little bit. " + larder;
-			})
+			Text = "The ruined remains of what once was civilization sprawls out in front of you, not much can be found here, at least unless you have a way to refine the things you might find laying around."
+		};
+
+		public static Area Swamp = new Area()
+		{
+			Name = "Swamp",
+			IsFirstVisit = false,
+			Event = Events.SwampEvent,
+			Text = "The swamps stink, are unpleasant, and full of bugs. You'll have a hard time finding fresh water, but mushrooms and amfibians will be easy to come by."
+		};
+
+		public static Area River = new Area()
+		{
+			Name = "River",
+			IsFirstVisit = false,
+			Event = Events.RiverEvent,
+			Text = "The waterlands are pleasant. Flowing water can be heard in just about every direction. Fish and fresh water will be plentifull."
 		};
 
 		public static Area Starting = new Area()
@@ -324,9 +174,6 @@ namespace LostWorlds
 			FirstVisitTime = 0,
 			Text = "You look down at yourself and nod, seeing as your body is as it should. You look out and the world slowly comes into focus, only thing to do now is go on and live your new life.",
 			Options = new List<Area>()
-			{
-				Home
-			}
 		};
 		
 		//choosing the player's gender
@@ -342,7 +189,7 @@ namespace LostWorlds
 			ActionTime = 0,
 			FirstVisitTime = 0,
 			TravelTime = 0,
-			Text = "Welcome to the world of Lost Worlds. For the time being, you'll only be able to visit a few areas, and not exactly be able to interact with anything. But it will take some time to do these things, so, you'll get to see how things work and change. For now, you have unlimited water, but will need to go and find food out in the woods, and you'll need to go back to ''base'' in order to consume the food and water. Enjoy this tiny little bit for now ^-^",
+			Text = "Welcome to Lost Worlds V1. This version has exploration, survival, and character creation. Some things to note in this version are: Be careful when crossing chunk edges (marked with a thin gray line) as if you are dragging too quickly, the map has a high chanse of braking and sending you an entire chunk away (solution in the works). The next version will focus on some optimizations, and adding in new features. Things the next version will add: 1) static locations [like your home base] 2) more enemies 3) more things to gather and find",
 			IsFirstVisit = false,
 			Options = new List<Area>()
 			{

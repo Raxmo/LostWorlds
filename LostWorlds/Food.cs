@@ -22,14 +22,32 @@ namespace LostWorlds
 	{
 		public static readonly Food Fish = new Food()
 		{
-			Energy = 2.815,
-			Water = 0.414
+			Energy = 4.453,
+			Water = 0.722
 		};
 
 		public static readonly Food Berries = new Food()
 		{
-			Energy = 1.141,
-			Water = 0.445
+			Energy = 2.995,
+			Water = 0.831
+		};
+
+		public static readonly Food Mushrooms = new Food()
+		{
+			Energy = 0.275,
+			Water = 0.273
+		};
+
+		public static readonly Food Rye = new Food()
+		{
+			Energy = 10.101,
+			Water = 0.075
+		};
+
+		public static readonly Food Cactus = new Food()
+		{
+			Energy = 0.246,
+			Water = 0.95
 		};
 	}
 }

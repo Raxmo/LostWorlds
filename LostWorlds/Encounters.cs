@@ -73,7 +73,10 @@ namespace LostWorlds
 		private void AttackClicked(object sender, EventArgs e)
 		{
 			MainWindow.App.MainText.SelectAll();
-			MainWindow.App.MainText.Selection.Text = Characters.Player.Attack(enemy) + (enemy.isAlive ? enemy.HealthState() + enemy.Attack(Characters.Player) : enemy.AT.death[Utils.rand.Next(enemy.AT.death.Count)]) + Characters.Player.HealthState();
+			MainWindow.App.MainText.Selection.Text = 
+				Characters.Player.Attack(enemy) + (enemy.isAlive ? enemy.HealthState() + enemy.Attack(Characters.Player) : 
+				enemy.AT.death[Utils.rand.Next(enemy.AT.death.Count)]) + (Characters.Player.isAlive ?  Characters.Player.HealthState() : 
+				Characters.Player.AT.death[Utils.rand.Next(Characters.Player.AT.death.Count)]);
 
 			// not sure if ther is a more elegant way of doing this, if there is, would be most appreciated if you could make it a thing ^-^, also, I wish there was a nand opperator T-T I don't think it would have been that hard to put in !& as an opperator to be honest...
 			if (! (enemy.isAlive && Characters.Player.isAlive)) 
@@ -91,19 +94,22 @@ namespace LostWorlds
 		{
 			if(!Characters.Player.isAlive)
 			{
-				Areas.Home.Load();
+				MapInfo.CanDrag = true;
+				Areas.Starting.Load();
 			}
 			else
 			{
-
+				MapInfo.CanDrag = true;
 				Location?.Load();
 			}
 		}
 
 		public void Load()
 		{
+			enemy = (Enemy)Activator.CreateInstance(enemy.GetType());
 			LoadActions();
 			Location = Areas.Curr;
+			MapInfo.CanDrag = false;
 			MainWindow.App.MainText.SelectAll();
 			MainWindow.App.MainText.Selection.Text = enemy.init + " " + Characters.Player.HealthState();
 		}
@@ -111,12 +117,36 @@ namespace LostWorlds
 
 	public static class Encounters
 	{
+		public class Aligator : Encounter
+		{
+			public Aligator()
+			{
+				enemy = new Enemies.Alagator();
+			}
+		}
+
+		public class Wolf : Encounter
+		{
+			public Wolf()
+			{
+				enemy = new Enemies.Wolf();
+			}
+		};
+		
+		public class Raygolyth : Encounter
+		{
+			public Raygolyth()
+			{
+				enemy = new Enemies.Raygolyth();
+			}
+		}
+
 		public class tester : Encounter
 		{
 			public tester()
 			{
 				enemy = new Enemies.test();
 			}
-		}
+		};
 	}
 }
